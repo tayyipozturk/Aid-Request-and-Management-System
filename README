@@ -1,0 +1,28 @@
+# Project
+
+Aid Request and Management System
+
+##
+
+This project consists of a user class with authorization login functions.
+A campaign consists request multiple requests.
+Requesters can create requests and run queries to look for requests. They can create watchers to get notified of specific request creations.
+Requesters can request delivery of items they want if they have stock.
+Providers can inform requesters about their stock and provide items if they want to.
+
+## Students
+
+Mustafa Burak Akkaya
+2396968
+
+Muhammed Tayyip Öztürk
+2380806
+
+## Content of Files
+
+demo.py: Main demo tester
+Class.campaign.py: Campaign Class File
+Class.item.py: Item Class File
+Class.request.py: Request Class File
+Class.user.py: User Class File
+Enum.urgency.py: Urgency Enum File
