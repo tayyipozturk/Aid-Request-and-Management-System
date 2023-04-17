@@ -40,7 +40,7 @@ class Campaign:
                                 break
                     if item_exists != len(watch["item"]):
                         is_okay = False
-                if not is_okay and watch["loc"] is not None:            
+                if is_okay and watch["loc"] is not None:            
                         #two geoloc and a rectangle
                     if watch["loc"]["type"] == 0:
                         geoloc0 = request.geoloc
@@ -54,9 +54,9 @@ class Campaign:
                         if float(geoloc0[0]) > max_longtitude or float(geoloc0[0]) < min_longtitude or float(geoloc0[1]) > max_latitude or float(geoloc0[1]) < min_latitude:
                             is_okay = False
                     elif watch["loc"]["type"] == 1:
-                        if (request.geoloc[0] - watch["loc"]["values"][0])**2 + (request.geoloc[1] - watch["loc"]["values"][1])**2 > watch["loc"]["values"][2]**2:
+                        if (request.geoloc[0] - watch["loc"]["values"][0][0])**2 + (request.geoloc[1] - watch["loc"]["values"][0][1])**2 > watch["loc"]["values"][1]**2:
                             is_okay = False
-                if not is_okay and watch['urgency'] is not None:
+                if is_okay and watch['urgency'] is not None:
                     if Urgency[request.urgency].value > Urgency[watch['urgency']].value:
                         is_okay = False
                 if is_okay:
@@ -131,7 +131,7 @@ class Campaign:
                                 break
                     if item_exists != len(item):
                         is_okay = False
-                if not is_okay and loc is not None:    
+                if is_okay and loc is not None:    
                     if loc["type"] == 0:
                         geoloc0 = request['data'].geoloc
                         target_geoloc0 = loc['values'][0]
@@ -143,9 +143,9 @@ class Campaign:
                         if float(geoloc0[0]) > max_longtitude or float(geoloc0[0]) < min_longtitude or float(geoloc0[1]) > max_latitude or float(geoloc0[1]) < min_latitude:
                             is_okay = False
                     elif loc["type"] == 1:
-                        if (request["data"].geoloc[0] - loc["values"][0])**2 + (request["data"].geoloc[1] - loc["values"][1])**2 > loc["values"][2]**2:
+                        if (request["data"].geoloc[0] - loc["values"][0][0])**2 + (request["data"].geoloc[1] - loc["values"][0][1])**2 > loc["values"][1]**2:
                             is_okay = False
-                if not is_okay and urgency is not None:
+                if is_okay and urgency is not None:
                     if Urgency[request["data"].urgency].value > Urgency[urgency].value:
                         is_okay = False
                 if is_okay:

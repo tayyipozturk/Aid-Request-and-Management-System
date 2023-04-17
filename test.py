@@ -136,9 +136,9 @@ def RequestTest():
     provider = User("jerry", "jerry@localhost", "Jerry", "123")
     
     # Multiple inputs
-    request = Request(requester, [{"data": Item.search("camasir suyu"), "amount": 5}, {"data": Item.search("simit"), "amount": 3}], [41.015137,28.979530], "URGENT", "1st request")
-    request2 = Request(requester2, [{"data": Item.search("pil"), "amount": 1}, {"data": Item.search("cekirdek"), "amount": 7}], [41.015137,28.979530], "OPTIONAL", "2nd request")
-    request3 = Request(provider, [{"data": Item.search("camasir suyu"), "amount": 5}, {"data": Item.search("simit"), "amount": 3}], [41.015137,28.979530], "DAYS", "3rd request")
+    request = Request(requester.username, [{"data": Item.search("camasir suyu"), "amount": 5}, {"data": Item.search("simit"), "amount": 3}], [41.015137,28.979530], "URGENT", "1st request")
+    request2 = Request(requester2.username, [{"data": Item.search("pil"), "amount": 1}, {"data": Item.search("cekirdek"), "amount": 7}], [41.015137,28.979530], "OPTIONAL", "2nd request")
+    request3 = Request(provider.username, [{"data": Item.search("camasir suyu"), "amount": 5}, {"data": Item.search("simit"), "amount": 3}], [41.015137,28.979530], "DAYS", "3rd request")
 
     # Get all requests one by one
     print("All requests test")
@@ -147,14 +147,14 @@ def RequestTest():
 
     # Update request
     print("Updating request test")
-    request.update(owner=requester, items=[{"data": Item.search("camasir suyu"), "amount": 3}, {"data": Item.search("simit"), "amount": 3}], geoloc=[41.015137,28.979530], urgency="SOON", comments="Pls help")
+    request.update(owner=requester.username, items=[{"data": Item.search("camasir suyu"), "amount": 3}, {"data": Item.search("simit"), "amount": 3}], geoloc=[41.015137,28.979530], urgency="SOON", comments="Pls help")
     print(request.get())
     request2.update(geoloc=[41.0123,28.456], urgency="SOON", comments="Need help")
     print(request2.get())
     
     # Mark available request
     print("Marking request available test")
-    ma_id = request3.markavailable(user=provider, items=[{"data": Item.search("camasir suyu"), "amount": 3}, {"data": Item.search("simit"), "amount": 3}], expire=datetime.now(), geoloc=[41.015137,28.979530], comments="3rd request")
+    ma_id = request3.markavailable(user=provider.username, items=[{"data": Item.search("camasir suyu"), "amount": 3}, {"data": Item.search("simit"), "amount": 3}], expire=datetime.now(), geoloc=[41.015137,28.979530], comments="3rd request")
     print(request3.get())
 
     # Pick request
@@ -186,9 +186,9 @@ def CampaignTest():
     provider = User("jerry", "jerry@localhost", "Jerry", "123")
     
     # Multiple inputs
-    request = Request(requester, [{"data": Item.search("camasir suyu"), "amount": 5}, {"data": Item.search("simit"), "amount": 3}], [41.015137,28.979530], "URGENT", "1st request")
-    request2 = Request(requester2, [{"data": Item.search("pil"), "amount": 1}, {"data": Item.search("cekirdek"), "amount": 7}], [41.015137,28.979530], "OPTIONAL", "2nd request")
-    request3 = Request(provider, [{"data": Item.search("camasir suyu"), "amount": 5}, {"data": Item.search("simit"), "amount": 3}], [41.015137,28.979530], "DAYS", "3rd request")
+    request = Request(requester.username, [{"data": Item.search("camasir suyu"), "amount": 5}, {"data": Item.search("simit"), "amount": 3}], [41.015137,28.979530], "URGENT", "1st request")
+    request2 = Request(requester2.username, [{"data": Item.search("pil"), "amount": 1}, {"data": Item.search("cekirdek"), "amount": 7}], [41.015137,28.979530], "OPTIONAL", "2nd request")
+    request3 = Request(provider.username, [{"data": Item.search("camasir suyu"), "amount": 5}, {"data": Item.search("simit"), "amount": 3}], [41.015137,28.979530], "DAYS", "3rd request")
     # Create campaign
     campaign = Campaign("campaign1", "Here is the description")
     campaign2 = Campaign("campaign2", "Here is the description 2")
@@ -198,9 +198,9 @@ def CampaignTest():
     provider = User("jerry", "jerry@localhost", "Jerry", "123")
     
     # Multiple inputs
-    request = Request(requester, [{"data": Item.search("camasir suyu"), "amount": 5}, {"data": Item.search("simit"), "amount": 3}], [41.015137,28.979530], "URGENT", "1st request")
-    request2 = Request(requester2, [{"data": Item.search("pil"), "amount": 1}, {"data": Item.search("cekirdek"), "amount": 7}], [41.015137,28.979530], "SOON", "2nd request")
-    request3 = Request(provider, [{"data": Item.search("camasir suyu"), "amount": 5}, {"data": Item.search("simit"), "amount": 3}], [41.015137,28.979530], "DAYS", "3rd request")
+    request = Request(requester.username, [{"data": Item.search("camasir suyu"), "amount": 5}, {"data": Item.search("simit"), "amount": 3}], [41.015137,28.979530], "URGENT", "1st request")
+    request2 = Request(requester2.username, [{"data": Item.search("pil"), "amount": 1}, {"data": Item.search("cekirdek"), "amount": 7}], [41.015137,28.979530], "SOON", "2nd request")
+    request3 = Request(provider.username, [{"data": Item.search("camasir suyu"), "amount": 5}, {"data": Item.search("simit"), "amount": 3}], [41.015137,28.979530], "DAYS", "3rd request")
 
 
     # Add request to campaign
@@ -218,14 +218,14 @@ def CampaignTest():
 
     # Query rectangular area by two points' coordinate references
     print("Query rectangular area test")
-    campaign.query(item=Item.search("camasir suyu"), urgency="URGENT", loc={"type": 0, "values": [[41.015137,28.979530], [41.0123,28.456]]})
+    campaign.query(item=[Item.search("camasir suyu"), Item.search("elma")], urgency="URGENT", loc={"type": 0, "values": [[41.015137,28.979530], [41.0123,28.456]]})
     # Query circular area by center point's coordinate reference and radius
     print("Query circular area test")
-    campaign.query(item=Item.search("camasir suyu"), urgency="URGENT", loc={"type": 1, "values": [41.015137,28.979530, 1000]})
+    campaign.query(item=[Item.search("camasir suyu")], urgency="URGENT", loc={"type": 1, "values": [41.015137,28.979530, 1000]})
 
     # Watch campaign
     print("Watch campaign test")
-    watch_id = campaign.watch(callback=testPrint, item=Item.search("camasir suyu"), urgency="DAYS", loc={"type": 0, "values": [[41.015137,28.979530], [41.0123,28.456]]})
+    watch_id = campaign.watch(callback=testPrint, item=[Item.search("camasir suyu"), Item.search("armut")], urgency="DAYS", loc={"type": 0, "values": [[41.015137,28.979530], [41.0123,28.456]]})
     
     # Callback should be called after adding the target request
     print("Add request to campaign to check callback test")

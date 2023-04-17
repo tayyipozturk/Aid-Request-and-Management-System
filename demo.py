@@ -8,30 +8,17 @@ import os
 # User("admin", "admin@localhost", "Admin", "admin")
 # Campaign("Campaign 0", "desc")
 
-def callbackFunction(items, geoloc, urgency):
-    ret_str = ""
-    if len(items) != 0:
-        ret_str += "items: ["
-        for item in items:
-            ret_str += item.name + ", "
-        ret_str += "], "
-    if geoloc is not None:
-        ret_str += "geoloc: " + str(geoloc) + ", "
-    if urgency is not None:
-        ret_str += "urgency: " + urgency + ", "
-    print("CALLBACK: ", ret_str)
-
 choice = 0
 while True:
     if choice == 0:
         print("--------------------")
-        choice = int(input("1-User\n2-Item\n3-Campaign\n4-Exit\nChoice:"))
+        choice = int(input("1-User\n2-Item\n3-Campaign\n4-Exit\n> Choice:"))
     
     os.system('cls' if os.name == 'nt' else 'clear')
     print("--------------------")
     if choice == 1:
         print("User Menu")
-        operation_choice = int(input("0-Back To Menu\n1-Create User\n2-Get All Users\n3-Update User\n4-Delete User\n5-Authentication\n6-Login\n7-Check Session\n8-Logout\n> Choice:"))
+        operation_choice = int(input("0-Back To Menu\n1-Create User\n2-Get All Users\n3-Update User\n4-Delete User\n5-Authorization\n6-Login\n7-Check Session\n8-Logout\n> Choice:"))
         print("--------------------")
         os.system('cls' if os.name == 'nt' else 'clear')
         if operation_choice == 0:
@@ -40,10 +27,10 @@ while True:
         elif operation_choice == 1:
             print("Create User")
             print("--------------------")
-            fullname = input("Fullname:")
-            username = input("username:")
-            email = input("Email:")
-            password = input("Password:")
+            fullname = input("> Fullname:")
+            username = input("> username:")
+            email = input("> Email:")
+            password = input("> Password:")
             user = User(username, email, fullname, password)
             print("User Created Successfully")
             print("--------------------")
@@ -51,23 +38,29 @@ while True:
             print("Get All Users")
             print("--------------------")
             users = User.collection
+            print("Users:")
             for user in users:
                 print(user.get())
         elif operation_choice == 3:
             print("Update User")
             print("--------------------")
             users = User.collection
+            if (len(users) == 0):
+                input("> No users available. Press enter to continue...")
+                continue
+            print("Users:")
+            print("Index\tUser Data")
             for i, user in enumerate(users):
-                print(i, user.get())
-            choose_user = int(input("Choose User To Update:"))
+                print(i,"\t", user.get())
+            choose_user = int(input("> Choose User To Update:"))
             user = users[choose_user]
             # update user
             print("Update User's Info")
             print("Leave blank if you don't want to update")
-            fullname = input("Fullname:")
-            username = input("username:")
-            email = input("Email:")
-            password = input("Password:")
+            fullname = input("> Fullname:")
+            username = input("> username:")
+            email = input("> Email:")
+            password = input("> Password:")
             if fullname == "":
                 fullname = None
             if username == "":
@@ -84,32 +77,39 @@ while True:
             print("Delete User")
             print("--------------------")
             users = User.collection
+            if (len(users) == 0):
+                input("> No users available. Press enter to continue...")
+                continue
+            print("Users:")
+            print("Index\tUser Data")
             for i, user in enumerate(users):
-                print(i, user.get())
-            choose_user = int(input("Choose User To Delete:"))
+                print(i,"\t", user.get())
+            choose_user = int(input("> Choose User To Delete:"))
             user = users[choose_user]
             user.delete()
             print("User Deleted Successfully")
             print("--------------------")
         elif operation_choice == 5:
-            print("Authentication")
+            print("Authorization")
             print("--------------------")
             users = User.collection
+            print("Users:")
+            print("Index\tUser Data")
             for i, user in enumerate(users):
-                print(i, user.get())
-            choose_user = int(input("Choose User To Authenticate:"))
-            get_pass = input("Enter password:")
+                print(i,"\t", user.get())
+            choose_user = int(input("> Choose User To Authorize:"))
+            get_pass = input("> Enter password:")
             user = users[choose_user]
             if user.auth(get_pass):
-                print("User Authenticated Successfully")
+                print("User Authorized Successfully")
             else:
-                print("User Authentication Failed")
+                print("User Authorization Failed")
             print("--------------------")
         elif operation_choice == 6:
             print("Login")
             print("--------------------")
-            username = input("Enter username:")
-            password = input("Enter password:")
+            username = input("> Enter username:")
+            password = input("> Enter password:")
             if User.login(username, password) != None:
                 print("User Logged In Successfully")
             else:
@@ -119,9 +119,14 @@ while True:
             print("Check Session")
             print("--------------------")
             users = User.collection
+            if (len(users) == 0):
+                input("> No users available. Press enter to continue...")
+                continue
+            print("Users:")
+            print("Index\tUser Data")
             for i, user in enumerate(users):
-                print(i, user.get())
-            choose_user = int(input("Choose User To Check Session:"))
+                print(i,"\t", user.get())
+            choose_user = int(input("> Choose User To Check Session:"))
             user = users[choose_user]
             if user.checksession(user.token):
                 print("User Session is Valid")
@@ -132,9 +137,14 @@ while True:
             print("Logout")
             print("--------------------")
             users = User.collection
+            if (len(users) == 0):
+                input("> No users available. Press enter to continue...")
+                continue
+            print("Users:")
+            print("Index\tUser Data")
             for i, user in enumerate(users):
-                print(i, user.get())
-            choose_user = int(input("Choose User To Logout:"))
+                print(i,"\t", user.get())
+            choose_user = int(input("> Choose User To Logout:"))
             user = users[choose_user]
             if user.logout():
                 print("User Logged Out Successfully")
@@ -150,7 +160,7 @@ while True:
             choice = 0
             continue
         elif operation_choice == 1:
-            name = input("Name:")
+            name = input("> Name:")
             item = Item.search(name)
             if item is not None:
                 print(item.get())
@@ -170,16 +180,18 @@ while True:
                 print("No Items Found")
                 
             else:
+                print("Items:")
+                print("Index\tItem Name")
                 for i, item in enumerate(items):
-                    print(i, item.name)
-                choose_item = input("Choose Item To Update:")
+                    print(i,"\t", item.name)
+                choose_item = input("> Choose Item To Update:")
                 if choose_item != "":
                     item = items[int(choose_item)]
                     print("Enter name and synonyms to update, press enter to skip")
-                    name = input("Name:")
+                    name = input("> Name:")
                     synonyms = []
                     while True:
-                        synonym = input("Synonym:")
+                        synonym = input("> Synonym:")
                         if synonym == "":
                             break
                         synonyms.append(synonym)
@@ -201,9 +213,11 @@ while True:
                 print("No Items Found")
                 
             else:
+                print("Items:")
+                print("Index\tItem Name")
                 for i, item in enumerate(items):
-                    print(i, item.name)
-                choose_item = input("Choose Item To Delete:")
+                    print(i,"\t", item.name)
+                choose_item = input("> Choose Item To Delete:")
                 if choose_item != "":
                     item = items[int(choose_item)]
                     item.delete()
@@ -221,8 +235,8 @@ while True:
             choice = 0
             continue
         elif operation_choice == 1:
-            name = input("Name:")
-            description = input("Description:")
+            name = input("> Name:")
+            description = input("> Description:")
             campaign = Campaign(name, description)
             print("Campaign Created Successfully")
             print("--------------------")
@@ -230,23 +244,33 @@ while True:
             print("Add Request")
             print("--------------------")
             campaigns = Campaign.collection
+            if (len(campaigns) == 0):
+                input("> No campaigns available. Press enter to continue...")
+                continue
+            print("Campaigns:")
+            print("Index\tCampaign Name")
             for i, campaign in enumerate(campaigns):
-                print(i, campaign.name)
-            choose_campaign = int(input("Choose Campaign To Add Request:"))
+                print(i,"\t", campaign.name)
+            choose_campaign = int(input("> Choose Campaign To Add Request:"))
             campaign = campaigns[choose_campaign]
             
             # choose user to create request
             users = User.collection
+            if (len(users) == 0):
+                input("> No users available. Press enter to continue...")
+                continue
+            print("Users:")
+            print("Index\tUser Data")
             for i, user in enumerate(users):
-                print(i, user.get())
-            choose_user = int(input("Choose User To Create Request:"))
+                print(i,"\t", user.get())
+            choose_user = int(input("> Choose User To Create Request:"))
             user = users[choose_user]
 
             owner = user.username
             items = []
             print("Press enter to skip")
-            item_name = input("Item Name:")
-            amount = input("Requested Amount:")
+            item_name = input("> Item Name:")
+            amount = input("> Requested Amount:")
             while True:
                 if item_name == "":
                     break
@@ -255,14 +279,15 @@ while True:
                     item_test = Item.search(item_name)
                 items.append({"data": item_test, "amount": int(amount)})
                 print("Press enter to skip")
-                item_name = input("Item Name:")
-                amount = input("Requested Amount:")
+                item_name = input("> Item Name:")
+                amount = input("> Requested Amount:")
             
-            latitude = float(input("Latitude:"))
-            longtitude = float(input("Longtitude:"))
+            print("Geoloc data of request")
+            latitude = float(input("> Latitude:"))
+            longtitude = float(input("> Longtitude:"))
             geoloc = [longtitude, latitude]
             
-            urgency = int(input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\nChoose:"))
+            urgency = int(input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\n> Choose:"))
             if urgency == 1:
                 urgency = "URGENT"
             elif urgency == 2:
@@ -274,7 +299,7 @@ while True:
             elif urgency == 5:
                 urgency = "OPTIONAL"
 
-            comments = input("Enter Comment:")
+            comments = input("> Enter Comment:")
 
             request = Request(owner, items, geoloc, urgency, comments)
             campaign.addrequest(request)
@@ -284,9 +309,14 @@ while True:
             print("Get Request")
             print("--------------------")
             campaigns = Campaign.collection
+            if (len(campaigns) == 0):
+                input("> No campaigns available. Press enter to continue...")
+                continue
+            print("Campaigns:")
+            print("Index\tCampaign Name")
             for i, campaign in enumerate(campaigns):
-                print(i, campaign.name)
-            choose_campaign = int(input("Choose Campaign To Get Request:"))
+                print(i,"\t", campaign.name)
+            choose_campaign = int(input("> Choose Campaign To Get Request:"))
             campaign = campaigns[choose_campaign]
 
             requests = campaign.requests
@@ -295,8 +325,8 @@ while True:
                 print("--------------------")
             else:
                 for i, request in enumerate(requests):
-                    print(i, request['data'].get())
-                choose_request = int(input("Choose Request To Get:"))
+                    print(i,"\t", request['req_id'])
+                choose_request = int(input("> Choose Request To Get:"))
                 request = requests[choose_request]['data']
                 req_id = requests[choose_request]['req_id']
 
@@ -308,9 +338,14 @@ while True:
             print("Update Request")
             print("--------------------")
             campaigns = Campaign.collection
+            if (len(campaigns) == 0):
+                input("> No campaigns available. Press enter to continue...")
+                continue
+            print("Campaigns:")
+            print("Index\tCampaign Name")
             for i, campaign in enumerate(campaigns):
-                print(i, campaign.name)
-            choose_campaign = int(input("Choose Campaign To Update Request:"))
+                print(i,"\t", campaign.name)
+            choose_campaign = int(input("> Choose Campaign To Update Request:"))
             campaign = campaigns[choose_campaign]
 
             requests = campaign.requests
@@ -320,15 +355,18 @@ while True:
                 continue
             for i, request in enumerate(requests):
                 print(i, request['data'].get())
-            choose_request = int(input("Choose Request To Update:"))
+            choose_request = int(input("> Choose Request To Update:"))
             request = requests[choose_request]['data']
             req_id = requests[choose_request]['req_id']
 
             users = User.collection
+            if (len(users) == 0):
+                input("> No users available. Press enter to continue...")
+                continue
             for i, user in enumerate(users):
                 print(i, user.get())
-            choose_user = int(input("Update Owner of Request:"))
-            cancel = input("Enter to skip")
+            choose_user = int(input("> Update Owner of Request:"))
+            cancel = input("> Enter to skip")
             if cancel == "":
                 user = request.owner
             else:
@@ -338,8 +376,8 @@ while True:
             print("Enter Item Name and Amount to update, press enter to skip")
             items = []
             print("Press enter to skip")
-            item_name = input("Item Name:")
-            amount = input("Requested Amount:")
+            item_name = input("> Item Name:")
+            amount = input("> Requested Amount:")
             while True:
                 if item_name == "":
                     break
@@ -348,14 +386,14 @@ while True:
                     item_test = Item.search(item_name)
                 items.append({"data": item_test, "amount": int(amount)})
                 print("Press enter to skip")
-                item_name = input("Item Name:")
-                amount = input("Requested Amount:")
+                item_name = input("> Item Name:")
+                amount = input("> Requested Amount:")
             
-            latitude = float(input("Latitude:"))
-            longtitude = float(input("Longtitude:"))
+            latitude = float(input("> Latitude:"))
+            longtitude = float(input("> Longtitude:"))
             geoloc = [longtitude, latitude]
             
-            urgency = int(input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\nChoose:"))
+            urgency = int(input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\n> Choose:"))
             if urgency == 1:
                 urgency = "URGENT"
             elif urgency == 2:
@@ -367,7 +405,7 @@ while True:
             elif urgency == 5:
                 urgency = "OPTIONAL"
 
-            comments = input("Enter Comment:")
+            comments = input("> Enter Comment:")
             campaign.updaterequest(req_id, request)
             print("Request Updated Successfully")
             print("--------------------")
@@ -375,9 +413,14 @@ while True:
             print("Remove Request")
             print("--------------------")
             campaigns = Campaign.collection
+            if (len(campaigns) == 0):
+                input("> No campaigns available. Press enter to continue...")
+                continue
+            print("Campaigns:")
+            print("Index\tCampaign Name")
             for i, campaign in enumerate(campaigns):
-                print(i, campaign.name)
-            choose_campaign = int(input("Choose Campaign To Remove Request:"))
+                print(i,"\t", campaign.name)
+            choose_campaign = int(input("> Choose Campaign To Remove Request:"))
             campaign = campaigns[choose_campaign]
             
             requests = campaign.requests
@@ -385,9 +428,11 @@ while True:
                 print("No Requests")
                 print("--------------------")
                 continue
+            print("Requests:")
+            print("Index\tRequest Data")
             for i, request in enumerate(requests):
-                print(i, request["data"].get())
-            choose_request = int(input("Choose Request To Remove:"))
+                print(i,"\t", request["data"].get())
+            choose_request = int(input("> Choose Request To Remove:"))
             request = requests[choose_request]
 
             campaign.removerequest(request['req_id'])
@@ -395,14 +440,19 @@ while True:
         elif operation_choice == 6:
             print("Query")
             campaigns = Campaign.collection
+            if (len(campaigns) == 0):
+                input("> No campaigns available. Press enter to continue...")
+                continue
+            print("Campaigns:")
+            print("Index\tCampaign Name")
             for i, campaign in enumerate(campaigns):
-                print(i, campaign.name)
-            choose_campaign = int(input("Choose Campaign To Query Request:"))
+                print(i,"\t", campaign.name)
+            choose_campaign = int(input("> Choose Campaign To Query Request:"))
             campaign = campaigns[choose_campaign]
 
             items = []
             print("Press enter to skip")
-            item_name = input("Item Name:")
+            item_name = input("> Item Name:")
             while True:
                 if item_name == "":
                     break
@@ -411,10 +461,10 @@ while True:
                     found_item = Item.search(item_name)
                 items.append(found_item)           
                 print("Press enter to skip")
-                item_name = input("Item Name:")
+                item_name = input("> Item Name:")
             
             print("Press enter to skip")
-            location_type = input("Location Type:\n1-Rectangular\n2-Circular\n:")
+            location_type = input("Location Type:\n1-Rectangular\n2-Circular\n> Choose:")
             if(location_type == ""):
                 location_type = None
                 geoloc = None
@@ -425,24 +475,24 @@ while True:
 
             if location_type == "RECTANGULAR":
                 print("Enter Coordinates of First Corner")
-                latitude = float(input("Latitude:"))
-                longtitude = float(input("Longtitude:"))
+                latitude = float(input("> Latitude:"))
+                longtitude = float(input("> Longtitude:"))
                 corner1 = [longtitude, latitude]
                 print("Enter Coordinates of Second Corner")
-                latitude = float(input("Latitude:"))
-                longtitude = float(input("Longtitude:"))
+                latitude = float(input("> Latitude:"))
+                longtitude = float(input("> Longtitude:"))
                 corner2 = [longtitude, latitude]
                 geoloc = {'type': 0, 'values': [corner1, corner2]}
             elif location_type == "CIRCULAR":
                 print("Enter Coordinates of Center")
-                latitude = float(input("Latitude:"))
-                longtitude = float(input("Longtitude:"))
+                latitude = float(input("> Latitude:"))
+                longtitude = float(input("> Longtitude:"))
                 center = [longtitude, latitude]
-                radius = float(input("Radius:"))
+                radius = float(input("> Radius:"))
                 geoloc = {'type': 1, 'values': [center, radius]}
 
             print("Press enter to skip")
-            urgency = input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\nChoose:")
+            urgency = input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\n> Choose:")
             if urgency == "":
                 urgency = None
             elif int(urgency) == 1:
@@ -459,22 +509,28 @@ while True:
             if len(items) == 0:
                 items = None
             returnList = campaign.query(items, geoloc, urgency)
+            print("Query Successful")
+            print("Returned Requests:")
             for request in returnList:
                 print(request.get())
-            print("Query Successful")
             print("--------------------")
         elif operation_choice == 7:
             print("Watch")
             print("--------------------")
             campaigns = Campaign.collection
+            if (len(campaigns) == 0):
+                input("> No campaigns available. Press enter to continue...")
+                continue
+            print("Campaigns:")
+            print("Index\tCampaign Name")
             for i, campaign in enumerate(campaigns):
-                print(i, campaign.name)
-            choose_campaign = int(input("Choose Campaign To Get Offers:"))
+                print(i,"\t", campaign.name)
+            choose_campaign = int(input("> Choose Campaign To Get Offers:"))
             campaign = campaigns[choose_campaign]
 
             items = []
             print("Press enter to skip")
-            item_name = input("Item Name:")
+            item_name = input("> Item Name:")
             while True:
                 if item_name == "":
                     break
@@ -483,9 +539,9 @@ while True:
                     found_item = Item.search(item_name)
                 items.append(found_item)               
                 print("Press enter to skip")
-                item_name = input("Item Name:")
+                item_name = input("> Item Name:")
 
-            location_type = input("Location Type:\n1-Rectangular\n2-Circular\nChoose:")
+            location_type = input("Location Type:\n1-Rectangular\n2-Circular\n> Choose:")
             if location_type == "":
                 location_type = None
                 geoloc = None
@@ -496,23 +552,23 @@ while True:
 
             if location_type == "RECTANGULAR":
                 print("Enter Coordinates of First Corner")
-                latitude = float(input("Latitude:"))
-                longtitude = float(input("Longtitude:"))
+                latitude = float(input("> Latitude:"))
+                longtitude = float(input("> Longtitude:"))
                 corner1 = [longtitude, latitude]
                 print("Enter Coordinates of Second Corner")
-                latitude = float(input("Latitude:"))
-                longtitude = float(input("Longtitude:"))
+                latitude = float(input("> Latitude:"))
+                longtitude = float(input("> Longtitude:"))
                 corner2 = [longtitude, latitude]
                 geoloc = {'type': 0, 'values': [corner1, corner2]}
             elif location_type == "CIRCULAR":
                 print("Enter Coordinates of Center")
-                latitude = float(input("Latitude:"))
-                longtitude = float(input("Longtitude:"))
+                latitude = float(input("> Latitude:"))
+                longtitude = float(input("> Longtitude:"))
                 center = [longtitude, latitude]
-                radius = float(input("Radius:"))
+                radius = float(input("> Radius:"))
                 geoloc = {'type': 1, 'values': [center, radius]}
             
-            urgency = input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\nChoose:")
+            urgency = input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\n> Choose:")
             if urgency == "":
                 urgency = None
             elif int(urgency) == 1:
@@ -538,15 +594,22 @@ while True:
             print("Unwatch")
             print("--------------------")
             campaigns = Campaign.collection
+            if (len(campaigns) == 0):
+                input("> No campaigns available. Press enter to continue...")
+                continue
+            print("Campaigns:")
+            print("Index\tCampaign Name")
             for i, campaign in enumerate(campaigns):
-                print(i, campaign.name)
-            choose_campaign = int(input("Choose Campaign To Get Offers:"))
+                print(i,"\t", campaign.name)
+            choose_campaign = int(input("> Choose Campaign To Get Offers:"))
             campaign = campaigns[choose_campaign]
             
             watches = campaign.watches
             if len(watches) == 0:
                 print("No Watches")
             else:
+                print("Watches:")
+                print("Index\tWatch Info")
                 for i, watch in enumerate(watches):
                     ret_str = ""
                     if watch["item"] != None and len(watch["item"]) != 0:
@@ -558,8 +621,8 @@ while True:
                         ret_str += "loc: " + str(watch["loc"]) + ", "
                     if watch["urgency"] is not None:
                         ret_str += "urgency: " + watch["urgency"] + ", "
-                    print(i, ret_str)
-                choose_watch = input("Choose Watch To Remove:")
+                    print(i,"\t", ret_str)
+                choose_watch = input("> Choose Watch To Remove:")
                 if (choose_watch != ""):
                     watch = watches[int(choose_watch)]
                     watch_id = watch['watch_id']
@@ -570,5 +633,5 @@ while True:
     elif choice == 4:
         break
     print("--------------------")
-    input("Press Enter To Continue...")
+    input("> Press Enter To Continue...")
 

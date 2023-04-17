@@ -74,7 +74,7 @@ This file contains the Request class. It has the following attributes:
 
 - owner -> string
 - items_dict -> dictionary of items and their quantities -> `{'item': <itemname>, 'availibility': <availibility>, 'onroute': <onroute>}`
-- geoloc -> in the form of rectangular region `` 'type': 0, 'values`: [[long, latitude],[long, latitude]] `` or circular region `'type': 1, 'values': [long, latitude, radius]`
+- geoloc -> in the form of rectangular region `` 'type': 0, 'values`: [[long, latitude],[long, latitude]] `` or circular region `'type': 1, 'values': [[long, latitude], radius]`
 - urgency -> integer from 1 to 5
 - comment -> string
 - status -> string `open` or `closed`
@@ -83,7 +83,7 @@ This file contains the Request class. It has the following attributes:
 It has the following methods:
 
 - `__init__`: Constructor
-- `get()` : Returns the request's information as dictionary. -> `{'owner': <ownername>, 'items': [{'item': <itemname>, 'availibility': <availibility>, 'onroute': <onroute>}, ...], 'geoloc': {'type': <type>, 'values': [<value1>, <value2>, ...]}, 'urgency': <urgency>, 'comment': <comment>>}`
+- `get()` : Returns the request's information as dictionary. -> `{'owner': <username>, 'items': [{'item': <itemname>, 'availibility': <availibility>, 'onroute': <onroute>}, ...], 'geoloc': {'type': <type>, 'values': [<value1>, <value2>, ...]}, 'urgency': <urgency>, 'comment': <comment>>}`
 - `update(owner=None, items_dict=None, geoloc=None, urgency=None, comment=None)` : Updates the request's information, returns True if successful, False otherwise
 - `delete()` : Deletes the request, return True if successful, False otherwise
 - `markavailable(user, items, expire, geoloc, comments)` : Marks the request as available. Returns unique ma_id if successful
@@ -108,8 +108,8 @@ It has the following methods:
 - `remove(requestid)` : Removes a request from the campaign. Returns True if successful, False otherwise
 - `update(requestid, owner=None, items_dict=None, geoloc=None, urgency=None, comment=None)` : Updates the request's information, returns True if successful, False otherwise
 - `getrequest(requestid)` : Returns the request `(request_dict['data'].get())` with the given id if found, None otherwise
-- `query(item=None, loc=None, urgency=None)` : Returns a list of requests that match the given parameters
-- `watch(callback, item, loc, urgency)` : Adds a watch to the campaign for the items. Returns watch id if successful, None otherwise
+- `query(item=None, loc=None, urgency=None)` : Returns a list of requests that match the given parameters. Item parameter is an array of Items.
+- `watch(callback, item, loc, urgency)` : Adds a watch to the campaign for the items in the item array. Returns watch id if successful, None otherwise
 - `unwatch(watchid)` : Removes a watch from the campaign. Returns True if successful, False otherwise
 
 ### Enum.urgency.py
