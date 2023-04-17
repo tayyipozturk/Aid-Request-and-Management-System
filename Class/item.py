@@ -8,8 +8,7 @@ class Item:
 
     def get(self):
         # Return item as json
-        synonymtxt = ",".join(self.synonyms)
-        return '{"name":"' + self.name + '","synonyms":"' + synonymtxt + '"}'
+        return '{"name":"' + self.name + '","synonyms":"' + str(self.synonyms) + '"}'
     
     def update(self, name=None, synonyms=None):
         # Update item with new values
