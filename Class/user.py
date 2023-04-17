@@ -14,7 +14,7 @@ class User:
         User.collection.append(self)
     
     def get(self):
-        return '{"username":"' + self.username + '","email":"' + self.email + '","fullname":"' + self.fullname + '","passwd":"' + self.passwd + '"}'
+        return '{"username":"' + self.username + '","email":"' + self.email + '","fullname":"' + self.fullname + '","token":"' + (self.token if self.token else "")  + '","passwd":"' + self.passwd + '"}'
     
     def update(self, username=None, email=None, fullname=None, passwd=None):
         # Update user with new values
@@ -42,15 +42,16 @@ class User:
             return True
         else:
             return False
-
-    def login(self):
+    
+    @staticmethod
+    def login(username,passwd):
         # Login user if not already logged in
-        if User.checksession(self.token):
-            return None
-        else:
-            self.token = self.username + str(random.randint(100000, 999999))
-            User.sessions.append(self.token)
-            return self.token
+        for user in User.collection:
+            if user.username == username and ws.check_password_hash(user.passwd, passwd) and not User.checksession(user.token):
+                user.token = user.username + str(random.randint(100000, 999999))
+                User.sessions.append(user.token)
+                return user.token
+        return None
 
     @staticmethod
     def checksession(token):

@@ -32,7 +32,7 @@ def UserTest():
     # Login users
     print("Logging in user test")
     for client in User.collection:
-        if client.login():
+        if User.login(client.username, client.passwd) != None:
             print("User logged in")
         else:
             print("User has already logged in")

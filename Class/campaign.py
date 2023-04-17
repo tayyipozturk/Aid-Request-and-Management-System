@@ -32,12 +32,13 @@ class Campaign:
             else:
                 is_okay = True
                 if watch["item"] is not None:
-                    item_exists = False
-                    for itemi in request.items_dict:
-                        if itemi["item"]["data"] == watch["item"]:
-                            item_exists = True
-                            break
-                    if not item_exists:
+                    item_exists = 0
+                    for itemi in watch["item"]:
+                        for itemj in request.items_dict:
+                            if itemj["item"]["data"] == itemi:
+                                item_exists += 1
+                                break
+                    if item_exists != len(watch["item"]):
                         is_okay = False
                 if not is_okay and watch["loc"] is not None:            
                         #two geoloc and a rectangle
@@ -56,10 +57,11 @@ class Campaign:
                         if (request.geoloc[0] - watch["loc"]["values"][0])**2 + (request.geoloc[1] - watch["loc"]["values"][1])**2 > watch["loc"]["values"][2]**2:
                             is_okay = False
                 if not is_okay and watch['urgency'] is not None:
-                    if Urgency(request.watch['urgency']) > Urgency(watch['urgency']):
+                    if Urgency[request.urgency].value > Urgency[watch['urgency']].value:
                         is_okay = False
                 if is_okay:
-                    watch["callback"]()
+                    if watch["callback"] is not None:
+                        watch["callback"]()
                     
         return req_id
 
@@ -100,7 +102,7 @@ class Campaign:
         return None
     
     def query(self,item=None,loc=None,urgency=None):
-        # item is an Item object
+        # item is a list of Item object
         # geoloc is [] of longitude and latitude
         # loc is {"type": Number, "values": []}. If type is 0, values consists two geoloc. If type is 1, values consists a geoloc and a radius.
         # urgency is a String
@@ -121,12 +123,13 @@ class Campaign:
                 # If we don't match any of these negative conditions, add to return list
                 is_okay = True
                 if item is not None:
-                    item_exists = False
-                    for itemi in request["data"].items_dict:
-                        if itemi["item"]["data"] == item:
-                            item_exists = True
-                            break
-                    if not item_exists:
+                    item_exists = 0
+                    for itemi in item:
+                        for itemj in request["data"].items_dict:
+                            if itemj["item"]["data"] == itemi:
+                                item_exists += 1
+                                break
+                    if item_exists != len(item):
                         is_okay = False
                 if not is_okay and loc is not None:    
                     if loc["type"] == 0:
@@ -149,8 +152,9 @@ class Campaign:
                     returnList.append(request["data"])
         return returnList
         
-    def watch(self, callback, item, loc,urgency):
+    def watch(self, callback=None, item=None,loc=None,urgency=None):
         # Add a watcher with callback function to the list 
+        # item is a list of Item object
         # Return the watch_id
         watch_id = uuid.uuid4()
         self.watches.append({"watch_id": watch_id, "callback": callback, "item": item, "loc": loc, "urgency": urgency})

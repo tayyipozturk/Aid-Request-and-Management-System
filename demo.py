@@ -3,20 +3,37 @@ from Class.item import Item
 from Class.request import Request
 from Class.campaign import Campaign
 from datetime import datetime
+import os
 
-User("admin", "admin@localhost", "Admin", "admin")
-Campaign("Campaign 0", "desc")
+# User("admin", "admin@localhost", "Admin", "admin")
+# Campaign("Campaign 0", "desc")
+
+def callbackFunction(items, geoloc, urgency):
+    ret_str = ""
+    if len(items) != 0:
+        ret_str += "items: ["
+        for item in items:
+            ret_str += item.name + ", "
+        ret_str += "], "
+    if geoloc is not None:
+        ret_str += "geoloc: " + str(geoloc) + ", "
+    if urgency is not None:
+        ret_str += "urgency: " + urgency + ", "
+    print("CALLBACK: ", ret_str)
 
 choice = 0
 while True:
     if choice == 0:
         print("--------------------")
         choice = int(input("1-User\n2-Item\n3-Campaign\n4-Exit\nChoice:"))
+    
+    os.system('cls' if os.name == 'nt' else 'clear')
     print("--------------------")
     if choice == 1:
         print("User Menu")
         operation_choice = int(input("0-Back To Menu\n1-Create User\n2-Get All Users\n3-Update User\n4-Delete User\n5-Authentication\n6-Login\n7-Check Session\n8-Logout\n> Choice:"))
         print("--------------------")
+        os.system('cls' if os.name == 'nt' else 'clear')
         if operation_choice == 0:
             choice = 0
             continue
@@ -91,12 +108,9 @@ while True:
         elif operation_choice == 6:
             print("Login")
             print("--------------------")
-            users = User.collection
-            for i, user in enumerate(users):
-                print(i, user.get())
-            choose_user = int(input("Choose User To Login:"))
-            user = users[choose_user]
-            if user.login() != None:
+            username = input("Enter username:")
+            password = input("Enter password:")
+            if User.login(username, password) != None:
                 print("User Logged In Successfully")
             else:
                 print("User Already Logged In")
@@ -131,6 +145,7 @@ while True:
         print("Item Menu")
         operation_choice = int(input("0-Back To Menu\n1-Search Item\n2-Get All Items\n3-Update Item\n4-Delete Item\n> Choice:"))
         print("--------------------")
+        os.system('cls' if os.name == 'nt' else 'clear')
         if operation_choice == 0:
             choice = 0
             continue
@@ -150,45 +165,60 @@ while True:
         elif operation_choice == 3:
             print("Update Item")
             print("--------------------")
-            name = input("Name of item to update:")
-            item = Item.search(name)
-
-            if item is not None:
-                print("Enter name and synonyms to update, press enter to skip")
-                name = input("Name:")
-                synonyms = []
-                while True:
-                    synonym = input("Synonym:")
-                    if synonym == "":
-                        break
-                    synonyms.append(synonym)
-                if name != "" and len(synonyms) > 0:
-                    item.update(name, synonyms)
-                elif name != "" and len(synonyms) == 0:
-                    item.update(name=name)
-                elif name == "" and len(synonyms) > 0: 
-                    item.update(synonyms=synonyms)
-                print("Item Updated Successfully")
+            items = Item.collection
+            if len(items) == 0:
+                print("No Items Found")
+                
             else:
-                print("Item not found")
+                for i, item in enumerate(items):
+                    print(i, item.name)
+                choose_item = input("Choose Item To Update:")
+                if choose_item != "":
+                    item = items[int(choose_item)]
+                    print("Enter name and synonyms to update, press enter to skip")
+                    name = input("Name:")
+                    synonyms = []
+                    while True:
+                        synonym = input("Synonym:")
+                        if synonym == "":
+                            break
+                        synonyms.append(synonym)
+                    if name != "" and len(synonyms) > 0:
+                        item.update(name, synonyms)
+                    elif name != "" and len(synonyms) == 0:
+                        item.update(name=name)
+                    elif name == "" and len(synonyms) > 0: 
+                        item.update(synonyms=synonyms)
+                    print("Item updated successfully")
+                else:
+                    print("Item not found")
             print("--------------------")
         elif operation_choice == 4:
             print("Delete Item")
             print("--------------------")
-            name = input("Name of item to delete:")
-            item = Item.search(name)
-            if item is not None:
-                item.delete()
-                print("Item deleted successfully")
+            items = Item.collection
+            if len(items) == 0:
+                print("No Items Found")
+                
             else:
-                print("Item not found")
+                for i, item in enumerate(items):
+                    print(i, item.name)
+                choose_item = input("Choose Item To Delete:")
+                if choose_item != "":
+                    item = items[int(choose_item)]
+                    item.delete()
+                    print("Item deleted successfully")
+                else:
+                    print("Item not found")
             print("--------------------")
     elif choice == 3:
         print("Campaign Menu")
         print("--------------------")
-        operation_choice = int(input("0-Back To Menu\n1-Create Campaign\n2-Add Request\n3-Get Request\n4-Update Request\n5-Remove Request\n6-Query\n7-Watch\n8-Unwatch\nChoice:"))
+        operation_choice = int(input("0-Back To Menu\n1-Create Campaign\n2-Add Request\n3-Get Request\n4-Update Request\n5-Remove Request\n6-Query\n7-Watch\n8-Unwatch\n> Choice:"))
         print("--------------------")
+        os.system('cls' if os.name == 'nt' else 'clear')
         if operation_choice == 0:
+            choice = 0
             continue
         elif operation_choice == 1:
             name = input("Name:")
@@ -232,7 +262,7 @@ while True:
             longtitude = float(input("Longtitude:"))
             geoloc = [longtitude, latitude]
             
-            urgency = int(input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\n:"))
+            urgency = int(input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\nChoose:"))
             if urgency == 1:
                 urgency = "URGENT"
             elif urgency == 2:
@@ -263,15 +293,16 @@ while True:
             if len(requests) == 0:
                 print("No Requests")
                 print("--------------------")
-                continue
-            for i, request in enumerate(requests):
-                print(i, request['data'].get())
-            choose_request = int(input("Choose Request To Get:"))
-            request = requests[choose_request]['data']
-            req_id = requests[choose_request]['req_id']
+            else:
+                for i, request in enumerate(requests):
+                    print(i, request['data'].get())
+                choose_request = int(input("Choose Request To Get:"))
+                request = requests[choose_request]['data']
+                req_id = requests[choose_request]['req_id']
 
-            print(campaign.getrequest(req_id))
-            print("Request Retrieved Successfully")
+                print(campaign.getrequest(req_id))
+                print("Request Retrieved Successfully")
+                
             print("--------------------")
         elif operation_choice == 4:
             print("Update Request")
@@ -324,7 +355,7 @@ while True:
             longtitude = float(input("Longtitude:"))
             geoloc = [longtitude, latitude]
             
-            urgency = int(input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\n:"))
+            urgency = int(input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\nChoose:"))
             if urgency == 1:
                 urgency = "URGENT"
             elif urgency == 2:
@@ -372,19 +403,21 @@ while True:
             items = []
             print("Press enter to skip")
             item_name = input("Item Name:")
-            amount = input("Requested Amount:")
             while True:
                 if item_name == "":
                     break
-                items.append({"name": item_name, "amount": int(amount)})
+                found_item = Item.search(item_name)
+                if found_item is None:
+                    found_item = Item.search(item_name)
+                items.append(found_item)           
                 print("Press enter to skip")
                 item_name = input("Item Name:")
-                amount = input("Requested Amount:")
             
             print("Press enter to skip")
             location_type = input("Location Type:\n1-Rectangular\n2-Circular\n:")
             if(location_type == ""):
                 location_type = None
+                geoloc = None
             elif int(location_type) == 1:
                 location_type = "RECTANGULAR"
             elif int(location_type) == 2:
@@ -409,7 +442,7 @@ while True:
                 geoloc = {'type': 1, 'values': [center, radius]}
 
             print("Press enter to skip")
-            urgency = input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\n:")
+            urgency = input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\nChoose:")
             if urgency == "":
                 urgency = None
             elif int(urgency) == 1:
@@ -439,16 +472,26 @@ while True:
             choose_campaign = int(input("Choose Campaign To Get Offers:"))
             campaign = campaigns[choose_campaign]
 
-            items = Item.collection
-            for i, item in enumerate(items):
-                print(i, item.get())
-            choose_item = int(input("Choose Item To Get Offers:"))
-            item = items[choose_item]
+            items = []
+            print("Press enter to skip")
+            item_name = input("Item Name:")
+            while True:
+                if item_name == "":
+                    break
+                found_item = Item.search(item_name)
+                if found_item is None:
+                    found_item = Item.search(item_name)
+                items.append(found_item)               
+                print("Press enter to skip")
+                item_name = input("Item Name:")
 
-            location_type = int(input("Location Type:\n1-Rectangular\n2-Circular\n:"))
-            if location_type == 1:
+            location_type = input("Location Type:\n1-Rectangular\n2-Circular\nChoose:")
+            if location_type == "":
+                location_type = None
+                geoloc = None
+            elif int(location_type) == 1:
                 location_type = "RECTANGULAR"
-            elif location_type == 2:
+            elif int(location_type) == 2:
                 location_type = "CIRCULAR"
 
             if location_type == "RECTANGULAR":
@@ -469,20 +512,27 @@ while True:
                 radius = float(input("Radius:"))
                 geoloc = {'type': 1, 'values': [center, radius]}
             
-            urgency = int(input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\n:"))
-            if urgency == 1:
+            urgency = input("Urgency Choice:\n1-URGENT\n2-SOON\n3-DAYS\n4-WEEKS\n5-OPTIONAL\nChoose:")
+            if urgency == "":
+                urgency = None
+            elif int(urgency) == 1:
                 urgency = "URGENT"
-            elif urgency == 2:
+            elif int(urgency) == 2:
                 urgency = "SOON"
-            elif urgency == 3:
+            elif int(urgency) == 3:
                 urgency = "DAYS"
-            elif urgency == 4:
+            elif int(urgency) == 4:
                 urgency = "WEEKS"
-            elif urgency == 5:
+            elif int(urgency) == 5:
                 urgency = "OPTIONAL"
 
-            campaign.watch(item=item, geoloc=geoloc, urgency=urgency)
+            if len(items) == 0:
+                items = []
+            def callback():
+                print("-CALLBACK CALLED-")
+            watchid = campaign.watch(callback, items, geoloc, urgency)
             print("Watch Successful")
+            print("WATCH ID: ", watchid)
             print("--------------------")
         elif operation_choice == 8:
             print("Unwatch")
@@ -494,16 +544,31 @@ while True:
             campaign = campaigns[choose_campaign]
             
             watches = campaign.watches
-            for i, watch in enumerate(watches):
-                print(i, watch.get())
-            choose_watch = int(input("Choose Watch To Remove:"))
-            watch = watches[choose_watch]
-            watch_id = watch['watch_id']
+            if len(watches) == 0:
+                print("No Watches")
+            else:
+                for i, watch in enumerate(watches):
+                    ret_str = ""
+                    if watch["item"] != None and len(watch["item"]) != 0:
+                        ret_str += "items: ["
+                        for item in watch["item"]:
+                            ret_str += item.name + ", "
+                        ret_str += "], "
+                    if watch["loc"] is not None:
+                        ret_str += "loc: " + str(watch["loc"]) + ", "
+                    if watch["urgency"] is not None:
+                        ret_str += "urgency: " + watch["urgency"] + ", "
+                    print(i, ret_str)
+                choose_watch = input("Choose Watch To Remove:")
+                if (choose_watch != ""):
+                    watch = watches[int(choose_watch)]
+                    watch_id = watch['watch_id']
 
-            campaign.unwatch(watch_id)
-            print("Unwatch Successful")
-            print("--------------------")
+                    campaign.unwatch(watch_id)
+                    print("Unwatch Successful")
+                    print("--------------------")
     elif choice == 4:
         break
     print("--------------------")
     input("Press Enter To Continue...")
+
