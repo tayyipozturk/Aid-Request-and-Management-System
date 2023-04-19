@@ -109,7 +109,7 @@ class Request:
         for i, itemi in enumerate(items):
             for j, itemj in enumerate(self.items_dict):
                 if itemj["item"]['data'] == itemi["data"]:
-                    if itemj["availibility"] is not None and itemj["availibility"]["ma_id"] == itemid:
+                    if itemj["availibility"] is not None and itemj["availibility"]["ma_id"] == itemid and itemj["availibility"]["expire"] > datetime.now():
                         self.items_dict[j]["onroute"] = {"ma_id": itemid,"item": itemi["data"].name,"amount": min(itemj["item"]["amount"],itemj["availibility"]["amount"], itemi["amount"]), "supplier": itemj["availibility"]["supplier"], "expire": itemj["availibility"]["expire"], "geoloc": itemj["availibility"]["geoloc"], "comments": itemj["availibility"]["comments"]}
                     break
 
