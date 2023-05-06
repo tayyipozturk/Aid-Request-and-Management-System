@@ -11,15 +11,16 @@ from datetime import datetime, timedelta
 # "self.geoloc" is [] of longitude and latitude
 # "self.urgency" is a String that can be represented with corresponding enum
 # "self.comments" is a String
-# "self.items_dict" is a list of following dictionary 
+# "self.items_dict" is a list of following dictionary
 # {
 #  "item":
-#   {"data": Item, "amount": Number}, 
-#  "availibility": 
-#   {"ma_id": Id,"amount": Number, "supplier": User, "expire": Date, "geoloc": geoloc, "comments": String}, 
-#  "onroute": 
+#   {"data": Item, "amount": Number},
+#  "availibility":
+#   {"ma_id": Id,"amount": Number, "supplier": User, "expire": Date, "geoloc": geoloc, "comments": String},
+#  "onroute":
 #   {"ma_id": Id,"amount": Number, "supplier": User, "expire": Date, "geoloc": geoloc, "comments": String}
 # }
+
 
 class Request:
     collection = []
@@ -28,18 +29,22 @@ class Request:
         self.owner = owner
         self.items_dict = []
         for item in items:
-            self.items_dict.append({"item": item, "availibility": None, "onroute": None, "delivered": False})
+            self.items_dict.append(
+                {"item": item, "availibility": None, "onroute": None, "delivered": False})
         self.geoloc = geoloc
         self.urgency = urgency
         self.comments = comments
         self.status = 'OPEN'
         Request.collection.append(self)
-    
+
     def get(self):
-        itemstext = ["{\"item\": "+x["item"]["data"].get()+",\"amount\": "+str(x["item"]["amount"])+",\"delivered\": "+str(x["delivered"])+"}" for x in self.items_dict]
-        availibilitytext = ["{\"ma_id\": "+str(x["availibility"]["ma_id"])+",\"item\": "+str(x["availibility"]["item"])+",\"amount\": "+str(x["availibility"]["amount"])+",\"supplier\": "+x["availibility"]["supplier"].username+",\"expire\": "+str(x["availibility"]["expire"])+",\"geoloc\": "+str(x["availibility"]["geoloc"])+",\"comments\": "+x["availibility"]["comments"]+"}" for x in self.items_dict if x["availibility"] is not None]
-        onroutetext = ["{\"ma_id\": "+str(x["onroute"]["ma_id"])+",\"item\": "+str(x["onroute"]["item"])+",\"amount\": "+str(x["onroute"]["amount"])+",\"supplier\": "+x["onroute"]["supplier"].username+",\"expire\": "+str(x["onroute"]["expire"])+",\"geoloc\": "+str(x["onroute"]["geoloc"])+",\"comments\": "+x["onroute"]["comments"]+"}" for x in self.items_dict if x["onroute"] is not None]
-        return '{"owner":"' + self.owner + '","items":"' + str(itemstext) + '","geoloc":"' + str(self.geoloc) + '","urgency":"' + self.urgency + '","comments":"' + self.comments + '","status":"' + self.status + '","availibility":"' + str(availibilitytext) +  '","onroute":"' + str(onroutetext) +  '"}'
+        itemstext = ["{\"item\": "+x["item"]["data"].get()+",\"amount\": "+str(
+            x["item"]["amount"])+",\"delivered\": "+str(x["delivered"])+"}" for x in self.items_dict]
+        availibilitytext = ["{\"ma_id\": "+str(x["availibility"]["ma_id"])+",\"item\": "+str(x["availibility"]["item"])+",\"amount\": "+str(x["availibility"]["amount"])+",\"supplier\": "+x["availibility"]["supplier"].username +
+                            ",\"expire\": "+str(x["availibility"]["expire"])+",\"geoloc\": "+str(x["availibility"]["geoloc"])+",\"comments\": "+x["availibility"]["comments"]+"}" for x in self.items_dict if x["availibility"] is not None]
+        onroutetext = ["{\"ma_id\": "+str(x["onroute"]["ma_id"])+",\"item\": "+str(x["onroute"]["item"])+",\"amount\": "+str(x["onroute"]["amount"])+",\"supplier\": "+x["onroute"]["supplier"].username +
+                       ",\"expire\": "+str(x["onroute"]["expire"])+",\"geoloc\": "+str(x["onroute"]["geoloc"])+",\"comments\": "+x["onroute"]["comments"]+"}" for x in self.items_dict if x["onroute"] is not None]
+        return '{"owner":"' + self.owner + '","items":"' + str(itemstext) + '","geoloc":"' + str(self.geoloc) + '","urgency":"' + self.urgency + '","comments":"' + self.comments + '","status":"' + self.status + '","availibility":"' + str(availibilitytext) + '","onroute":"' + str(onroutetext) + '"}'
 
     def update(self, owner=None, items=None, geoloc=None, urgency=None, comments=None):
         # Check if the new items are compatible with onroute
@@ -56,17 +61,19 @@ class Request:
                         return False
             # If the new items are compatible with onroute
             # If new items exists in old items, use the old availibility and onroute
-            # If not, add with availibility and onroute to None        
+            # If not, add with availibility and onroute to None
             newlist = []
             for itemi in items:
                 added = False
                 for itemj in self.items_dict:
                     if itemi["data"] == itemj["item"]["data"]:
-                        newlist.append({"item": itemi, "availibility": itemj["availibility"], "onroute": itemj["onroute"]})
+                        newlist.append(
+                            {"item": itemi, "availibility": itemj["availibility"], "onroute": itemj["onroute"]})
                         added = True
                         break
                 if added == False:
-                    newlist.append({"item": itemi, "availibility": None, "onroute": None})
+                    newlist.append(
+                        {"item": itemi, "availibility": None, "onroute": None})
             self.items_dict = newlist
 
         if geoloc is not None:
@@ -98,19 +105,21 @@ class Request:
             for j, itemj in enumerate(self.items_dict):
                 if itemj["item"]["data"] == itemi["data"]:
                     if itemj["availibility"] is None or itemj["availibility"]["expire"] < datetime.now():
-                        self.items_dict[j]["availibility"] = {"ma_id": ma_id, "item": itemi["data"].name, "amount": itemi["amount"], "supplier": user, "expire": (datetime.now()+ timedelta(hours=int(expire))), "geoloc": geoloc, "comments": comments}
+                        self.items_dict[j]["availibility"] = {"ma_id": ma_id, "item": itemi["data"].name, "amount": itemi["amount"], "supplier": user, "expire": (
+                            datetime.now() + timedelta(hours=int(expire))), "geoloc": geoloc, "comments": comments}
                     break
         return ma_id
-    
-    def pick(self,itemid,items):
+
+    def pick(self, itemid, items):
         # Start delivery for every item in items
-        # Create a new onroute for deliveries. 
+        # Create a new onroute for deliveries.
         # If the amount of availibility is less than the amount of request, use the amount of availibility and vice versa
         for i, itemi in enumerate(items):
             for j, itemj in enumerate(self.items_dict):
                 if itemj["item"]['data'] == itemi["data"]:
                     if itemj["availibility"] is not None and itemj["availibility"]["ma_id"] == itemid and itemj["availibility"]["expire"] > datetime.now():
-                        self.items_dict[j]["onroute"] = {"ma_id": itemid,"item": itemi["data"].name,"amount": min(itemj["item"]["amount"],itemj["availibility"]["amount"], itemi["amount"]), "supplier": itemj["availibility"]["supplier"], "expire": itemj["availibility"]["expire"], "geoloc": itemj["availibility"]["geoloc"], "comments": itemj["availibility"]["comments"]}
+                        self.items_dict[j]["onroute"] = {"ma_id": itemid, "item": itemi["data"].name, "amount": min(itemj["item"]["amount"], itemj["availibility"]["amount"], itemi["amount"]), "supplier": itemj[
+                            "availibility"]["supplier"], "expire": itemj["availibility"]["expire"], "geoloc": itemj["availibility"]["geoloc"], "comments": itemj["availibility"]["comments"]}
                     break
 
         # Delete the availibility of given itemid

@@ -3,6 +3,7 @@ from Class.user import User
 from Class.request import Request
 from Class.item import Item
 import re
+import uuid
 
 
 class CampaignService:
@@ -30,20 +31,12 @@ class CampaignService:
             req_id = campaign.addrequest(request)
             client.sendall(f"Request added successfully: {req_id}".encode())
 
-    ### TODO: CAN'T FIND REQUEST ###
     @staticmethod
     def get_request(client, args, campaign):
         print(args.groupdict())
         id = args.group("id")
         with campaign.mutex:
-            request = None
-            for req in campaign.requests:
-                print(req["req_id"])
-                print(len(id))
-                if req["req_id"] == str(id):
-                    request = req["data"].get()
-                    break
-            print(request)
+            request = campaign.getrequest(id)
             if request != None:
                 client.sendall(request.encode())
             else:
@@ -51,7 +44,7 @@ class CampaignService:
 
     @staticmethod
     def update_request(client, args, campaign, token):
-        items = re.findall("([a-zA-Z0-9]+) ([0-9]+)", args.group("items"))
+        items_list = re.findall("([a-zA-Z0-9]+) ([0-9]+)", args.group("items"))
         num_items = args.group("n_items")
         latitude = float(args.group("latitude"))
         longtitude = float(args.group("longtitude"))
@@ -61,21 +54,22 @@ class CampaignService:
         items = []
         geoloc = [longtitude, latitude]
         with campaign.mutex:
-            for item in items:
-                item = item.split(" ")
+            for item in items_list:
                 item_test = Item.search(item[0])
                 if item_test is None:
                     item_test = Item.search(item[0])
                 items.append({"data": item_test, "amount": int(item[1])})
         username = User.find_one(token=token).username
         request = Request(username, items, geoloc, urgency, comments)
-        with mutex:
+        print(request.items_dict)
+        print(request)
+        with campaign.mutex:
             campaign.updaterequest(req_id, request)
             client.sendall(f"Request updated successfully: {req_id}".encode())
 
     def remove_request(client, args, campaign):
         id = args.group("id")
-        with mutex:
+        with campaign.mutex:
             campaign.removerequest(id)
             client.sendall(f"Request removed successfully: {id}".encode())
 

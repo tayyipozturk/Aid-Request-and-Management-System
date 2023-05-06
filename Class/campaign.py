@@ -94,7 +94,10 @@ class Campaign:
     def updaterequest(self, requestid, request):
         # Try to update request
         for req in self.requests:
-            if req["req_id"] == requestid:
+            check_val = req["req_id"]
+            if isinstance(requestid, str):
+                check_val = str(check_val)
+            if check_val == requestid:
                 if req["data"].update(owner=request.owner, items=[x["item"] for x in request.items_dict], geoloc=request.geoloc, urgency=request.urgency, comments=request.comments):
                     print("Request updated.")
                     return True
@@ -105,9 +108,15 @@ class Campaign:
         return False
 
     def getrequest(self, requestid):
+        print("------")
+        print(self.requests)
+        print("------")
         # Try to get request and return it
         for request in self.requests:
-            if request["req_id"] == requestid:
+            check_val = request["req_id"]
+            if isinstance(requestid, str):
+                check_val = str(check_val)
+            if check_val == requestid:
                 return request["data"].get()
         print("Request not found.")
         return None

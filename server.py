@@ -98,12 +98,16 @@ class ClientThread(threading.Thread):
                         else:
                             self.client_socket.sendall(
                                 "Error".encode())
-                    elif data[0] == "update_requests":
+                    elif data[0] == "update_request":
                         input_updateRequest = re.search(
                             "update_request (?P<n_items>[0-9]*) (?P<req_id>[a-zA-Z0-9\-]*) (?P<items>(([a-zA-Z0-9]*) ([0-9]*))+) (?P<latitude>[0-9]*) (?P<longtitude>[0-9]*) (?P<urgency>[a-zA-Z]*) (?P<descr>(.*)*)", input_data)
                         if input_updateRequest:
-                            CampaignService.update_request(
-                                self.client_socket, input_updateRequest, self.campaign, self.token)
+                            try:
+                                CampaignService.update_request(
+                                    self.client_socket, input_updateRequest, self.campaign, self.token)
+                            except:
+                                self.client_socket.sendall(
+                                    "Error".encode())
                         else:
                             self.client_socket.sendall(
                                 "Error".encode())
