@@ -9,7 +9,7 @@ class Item:
     def get(self):
         # Return item as json
         return '{"name":"' + self.name + '","synonyms":"' + str(self.synonyms) + '"}'
-    
+
     def update(self, name=None, synonyms=None):
         # Update item with new values
         if name is not None:
@@ -31,4 +31,19 @@ class Item:
             if name == item.name or name in item.synonyms:
                 return item
         newItem = Item(name)
+        return None
+
+    @staticmethod
+    def find_one(name=None, synonyms=None):
+        # Return item object
+        # If item not found, return None
+        if name is not None:
+            for item in Item.collection:
+                if name == item.name:
+                    return item
+        if synonyms is not None:
+            for item in Item.collection:
+                for synonym in item.synonyms:
+                    if synonym in synonyms:
+                        return item
         return None

@@ -1,20 +1,28 @@
 import uuid
 from Enum.urgency import Urgency
+import threading
 
 # "self.name" is a String
 # "self.description" is a String
 # "self.requests" is a list of {"req_id": req_id, "data": request}
 # "self.watches" is a list of {"watch_id": watch_id, "callback": callback, "item": item, "loc": loc, "urgency": urgency}
 
+
 class Campaign:
     collection = []
 
     def __init__(self, name, description):
+        # check if name is unique
+        for campaign in Campaign.collection:
+            if campaign.name == name:
+                print("Campaign name already exists.")
+                return
         self.name = name
         self.description = description
         self.requests = []
         self.watches = []
         Campaign.collection.append(self)
+        self.mutex = threading.Lock()
 
     def addrequest(self, request):
         # request is a Request object
@@ -22,7 +30,6 @@ class Campaign:
         req_id = uuid.uuid4()
         req_dict = {"req_id": req_id, "data": request}
         self.requests.append(req_dict)
-        
         # Check if the request matches any watch
         # If it does, call the callback
         # For algorithm, see query function
@@ -40,17 +47,21 @@ class Campaign:
                                 break
                     if item_exists != len(watch["item"]):
                         is_okay = False
-                if is_okay and watch["loc"] is not None:            
-                        #two geoloc and a rectangle
+                if is_okay and watch["loc"] is not None:
+                    # two geoloc and a rectangle
                     if watch["loc"]["type"] == 0:
                         geoloc0 = request.geoloc
                         target_geoloc0 = watch["loc"]['values'][0]
                         target_geoloc1 = watch["loc"]['values'][1]
                         # find if geloloc0 is in the rectangle
-                        max_longtitude = max(float(target_geoloc0[0]),float(target_geoloc1[0]))
-                        max_latitude = max(float(target_geoloc0[1]),float(target_geoloc1[1]))
-                        min_longtitude = min(float(target_geoloc0[0]),float(target_geoloc1[0]))
-                        min_latitude = min(float(target_geoloc0[1]),float(target_geoloc1[1]))
+                        max_longtitude = max(
+                            float(target_geoloc0[0]), float(target_geoloc1[0]))
+                        max_latitude = max(
+                            float(target_geoloc0[1]), float(target_geoloc1[1]))
+                        min_longtitude = min(
+                            float(target_geoloc0[0]), float(target_geoloc1[0]))
+                        min_latitude = min(
+                            float(target_geoloc0[1]), float(target_geoloc1[1]))
                         if float(geoloc0[0]) > max_longtitude or float(geoloc0[0]) < min_longtitude or float(geoloc0[1]) > max_latitude or float(geoloc0[1]) < min_latitude:
                             is_okay = False
                     elif watch["loc"]["type"] == 1:
@@ -61,8 +72,8 @@ class Campaign:
                         is_okay = False
                 if is_okay:
                     if watch["callback"] is not None:
-                        watch["callback"]()
-                    
+                        watch["callback"](f"WATCH MATCHED:\n{watch}".encode())
+
         return req_id
 
     def removerequest(self, requestid):
@@ -100,13 +111,13 @@ class Campaign:
                 return request["data"].get()
         print("Request not found.")
         return None
-    
-    def query(self,item=None,loc=None,urgency=None):
+
+    def query(self, item=None, loc=None, urgency=None):
         # item is a list of Item object
         # geoloc is [] of longitude and latitude
         # loc is {"type": Number, "values": []}. If type is 0, values consists two geoloc. If type is 1, values consists a geoloc and a radius.
         # urgency is a String
-        
+
         # If all arguments are None, return all requests
         if item is None and loc is None and urgency is None:
             return [request["data"] for request in self.requests]
@@ -115,11 +126,11 @@ class Campaign:
             # Look for requests that match the query
             for request in self.requests:
                 # Accept if all conditions are met
-                ## Check for if items don't match
-                ## Check for if geoloc don't match
-                ### If loc type is 0, check if requests geoloc is not in the rectangle
-                ### If loc type is 1, check if requests geoloc is not in the circle
-                ## Check for if urgency level is above
+                # Check for if items don't match
+                # Check for if geoloc don't match
+                # If loc type is 0, check if requests geoloc is not in the rectangle
+                # If loc type is 1, check if requests geoloc is not in the circle
+                # Check for if urgency level is above
                 # If we don't match any of these negative conditions, add to return list
                 is_okay = True
                 if item is not None:
@@ -131,15 +142,19 @@ class Campaign:
                                 break
                     if item_exists != len(item):
                         is_okay = False
-                if is_okay and loc is not None:    
+                if is_okay and loc is not None:
                     if loc["type"] == 0:
                         geoloc0 = request['data'].geoloc
                         target_geoloc0 = loc['values'][0]
                         target_geoloc1 = loc['values'][1]
-                        max_longtitude = max(float(target_geoloc0[0]),float(target_geoloc1[0]))
-                        max_latitude = max(float(target_geoloc0[1]),float(target_geoloc1[1]))
-                        min_longtitude = min(float(target_geoloc0[0]),float(target_geoloc1[0]))
-                        min_latitude = min(float(target_geoloc0[1]),float(target_geoloc1[1]))
+                        max_longtitude = max(
+                            float(target_geoloc0[0]), float(target_geoloc1[0]))
+                        max_latitude = max(
+                            float(target_geoloc0[1]), float(target_geoloc1[1]))
+                        min_longtitude = min(
+                            float(target_geoloc0[0]), float(target_geoloc1[0]))
+                        min_latitude = min(
+                            float(target_geoloc0[1]), float(target_geoloc1[1]))
                         if float(geoloc0[0]) > max_longtitude or float(geoloc0[0]) < min_longtitude or float(geoloc0[1]) > max_latitude or float(geoloc0[1]) < min_latitude:
                             is_okay = False
                     elif loc["type"] == 1:
@@ -151,19 +166,27 @@ class Campaign:
                 if is_okay:
                     returnList.append(request["data"])
         return returnList
-        
-    def watch(self, callback=None, item=None,loc=None,urgency=None):
-        # Add a watcher with callback function to the list 
+
+    def watch(self, callback=None, item=None, loc=None, urgency=None):
+        # Add a watcher with callback function to the list
         # item is a list of Item object
         # Return the watch_id
         watch_id = uuid.uuid4()
-        self.watches.append({"watch_id": watch_id, "callback": callback, "item": item, "loc": loc, "urgency": urgency})
+        self.watches.append({"watch_id": watch_id, "callback": callback,
+                            "item": item, "loc": loc, "urgency": urgency})
         return watch_id
 
-    def unwatch(self,watchid):
+    def unwatch(self, watchid):
         # Remove given watcher from the list
         for i, watch in enumerate(self.watches):
             if watch["watch_id"] == watchid:
                 self.watches.pop(i)
                 return True
         return False
+
+    @staticmethod
+    def find_one(name):
+        for campaign in Campaign.collection:
+            if campaign.name == name:
+                return campaign
+        return None

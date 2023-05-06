@@ -1,6 +1,7 @@
 import random
 import werkzeug.security as ws
 
+
 class User:
     collection = []
     sessions = []
@@ -9,13 +10,14 @@ class User:
         self.username = username
         self.email = email
         self.fullname = fullname
-        self.passwd = ws.generate_password_hash(passwd, method='pbkdf2:sha256', salt_length=8)
+        self.passwd = ws.generate_password_hash(
+            passwd, method='pbkdf2:sha256', salt_length=8)
         self.token = None
         User.collection.append(self)
-    
+
     def get(self):
-        return '{"username":"' + self.username + '","email":"' + self.email + '","fullname":"' + self.fullname + '","token":"' + (self.token if self.token else "")  + '","passwd":"' + self.passwd + '"}'
-    
+        return '{"username":"' + self.username + '","email":"' + self.email + '","fullname":"' + self.fullname + '","token":"' + (self.token if self.token else "") + '","passwd":"' + self.passwd + '"}'
+
     def update(self, username=None, email=None, fullname=None, passwd=None):
         # Update user with new values
         if username is not None:
@@ -25,10 +27,11 @@ class User:
         if fullname is not None:
             self.fullname = fullname
         if passwd is not None:
-            self.passwd = ws.generate_password_hash(passwd, method='pbkdf2:sha256', salt_length=8)
+            self.passwd = ws.generate_password_hash(
+                passwd, method='pbkdf2:sha256', salt_length=8)
 
     def delete(self):
-        # Remove user from collection and sessions 
+        # Remove user from collection and sessions
         # Delete user object
         User.collection.remove(self)
         if self.token is not None and self.token in User.sessions:
@@ -42,13 +45,14 @@ class User:
             return True
         else:
             return False
-    
+
     @staticmethod
-    def login(username,passwd):
+    def login(username, passwd):
         # Login user if not already logged in
         for user in User.collection:
             if user.username == username and ws.check_password_hash(user.passwd, passwd) and not User.checksession(user.token):
-                user.token = user.username + str(random.randint(100000, 999999))
+                user.token = user.username + \
+                    str(random.randint(100000, 999999))
                 User.sessions.append(user.token)
                 return user.token
         return None
@@ -68,3 +72,16 @@ class User:
             return True
         else:
             return False
+
+    @staticmethod
+    def find_one(username=None, token=None):
+        # Find user by username or token
+        if username is not None:
+            for user in User.collection:
+                if user.username == username:
+                    return user
+        elif token is not None:
+            for user in User.collection:
+                if user.token == token:
+                    return user
+        return None
