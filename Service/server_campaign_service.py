@@ -8,7 +8,7 @@ import uuid
 
 class CampaignService:
     @staticmethod
-    def add_request(client, args, campaign, token):
+    def add_request(monitor, args, campaign, token):
         item_list = re.findall("([a-zA-Z0-9]+) ([0-9]+)", args.group("items"))
         latitude = float(args.group("latitude"))
         longtitude = float(args.group("longtitude"))
@@ -27,20 +27,20 @@ class CampaignService:
         request = Request(username, items, geoloc, urgency, comments)
         with campaign.mutex:
             req_id = campaign.addrequest(request)
-            client.sendall(f"Request added successfully: {req_id}".encode())
+            monitor.enqueue(f"Request added successfully: {req_id}")
 
     @staticmethod
-    def get_request(client, args, campaign):
+    def get_request(monitor, args, campaign):
         id = args.group("id")
         with campaign.mutex:
             request = campaign.getrequest(id)
             if request != None:
-                client.sendall(request.encode())
+                monitor.enqueue(request)
             else:
-                client.sendall("Request not found".encode())
+                monitor.enqueue("Request not found")
 
     @staticmethod
-    def update_request(client, args, campaign, token):
+    def update_request(monitor, args, campaign, token):
         items_list = re.findall("([a-zA-Z0-9]+) ([0-9]+)", args.group("items"))
         latitude = float(args.group("latitude"))
         longtitude = float(args.group("longtitude"))
@@ -59,15 +59,16 @@ class CampaignService:
         request = Request(username, items, geoloc, urgency, comments)
         with campaign.mutex:
             campaign.updaterequest(req_id, request)
-            client.sendall(f"Request updated successfully: {req_id}".encode())
+            monitor.enqueue(f"Request updated successfully: {req_id}")
 
-    def remove_request(client, args, campaign):
+    def remove_request(monitor, args, campaign):
         id = args.group("id")
+        id = uuid.UUID(id)
         with campaign.mutex:
             campaign.removerequest(id)
-            client.sendall(f"Request removed successfully: {id}".encode())
+            monitor.enqueue(f"Request removed successfully: {id}")
 
-    def query(client, args, campaign, type):
+    def query(monitor, args, campaign, type):
         item_list = re.findall("([a-zA-Z0-9]+)", args.group("items"))
         urgency = args.group("urgency")
 
@@ -99,10 +100,10 @@ class CampaignService:
 
         if returnList is None:
             for request in returnList:
-                client.sendall(request.get().encode())
+                monitor.enqueue(request.get())
         return
 
-    def watch(client, args, campaign, type):
+    def watch(monitor, args, campaign, type):
         item_list = re.findall("([a-zA-Z0-9]+)", args.group("items"))
         urgency = args.group("urgency")
         watchid = None
@@ -130,25 +131,19 @@ class CampaignService:
             geoloc = {'type': 1, 'values': [center, radius]}
 
         with campaign.mutex:
-            watchid = campaign.watch(client.sendall, items, geoloc, urgency)
+            watchid = campaign.watch(monitor.enqueue, items, geoloc, urgency)
         if watchid is None:
-            client.sendall("Error: Watch not added".encode())
+            monitor.enqueue("Error: Watch not added")
         else:
-            client.sendall(f"Watch added successfully: {watchid}".encode())
+            monitor.enqueue(f"Watch added successfully: {watchid}")
         return watchid
 
-    def unwatch(client, watchid, campaign):
+    def unwatch(monitor, watchid, campaign):
         result = None
         with campaign.mutex:
             result = campaign.unwatch(watchid)
         if result:
-            client.sendall(f"Watch removed successfully: {watchid}".encode())
+            monitor.enqueue(f"Watch removed successfully: {watchid}")
         else:
-            client.sendall("Error: Watch not removed".encode())
+            monitor.enqueue("Error: Watch not removed")
         return
-
-    def callback(client, args, campaign):
-        id = args.group("id")
-        with campaign.mutex:
-            campaign.callback(id)
-            client.sendall(f"Callback called successfully: {id}".encode())

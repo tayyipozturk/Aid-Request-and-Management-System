@@ -10,57 +10,57 @@ new_cond = threading.Condition(new_mutex)
 
 class ServerParser:
     @staticmethod
-    def login(client, args):
+    def login(monitor, args):
         username = args.group("username")
         password = args.group("password")
         if len(username) > 0 and len(password) > 0:
             token = User.login(username, password)
             if token:
-                client.sendall(f"Login successful. Token: {token}".encode())
+                monitor.enqueue(f"Login successful. Token: {token}")
                 return token
             else:
-                client.sendall("Login failed".encode())
+                monitor.enqueue("Login failed")
         return None
 
     @staticmethod
-    def logout(client, token):
+    def logout(monitor, token):
         user = User.find_one(token=token)
         if user:
             user.logout()
-            client.sendall("Logout successful".encode())
+            monitor.enqueue("Logout successful")
             return True
         else:
-            client.sendall("Logout failed".encode())
+            monitor.enqueue("Logout failed")
             return False
 
     @staticmethod
-    def new(client, args):
+    def new(monitor, args):
         with new_mutex:
             name = args.group("name")
             descr = args.group("descr")
             if len(name) > 0:
                 campaign = Campaign(name=name, description=descr)
-                client.sendall("Campaign created".encode())
+                monitor.enqueue("Campaign created")
                 return campaign
             else:
-                client.sendall("Invalid input".encode())
+                monitor.enqueue("Invalid input")
 
     @staticmethod
-    def open(client, args):
+    def open(monitor, args):
         name = args.group("name")
         if len(name) > 0:
             campaign = Campaign.find_one(name)
             if campaign:
-                client.sendall("Campaign opened".encode())
+                monitor.enqueue("Campaign opened")
                 return campaign
             else:
-                client.sendall("Campaign not found".encode())
+                monitor.enqueue("Campaign not found")
         else:
-            client.sendall("Invalid number of arguments".encode())
+            monitor.enqueue("Invalid number of arguments")
         return None
 
     @staticmethod
-    def close(client, args, campaign, watches):
+    def close(monitor, args, campaign, watches):
         try:
             for watch in watches:
                 with campaign.mutex:
@@ -70,8 +70,8 @@ class ServerParser:
             return False
 
     @staticmethod
-    def list(client, args):
-        client.sendall("Index\tCampaign Name\t".encode())
+    def list(monitor, args):
+        monitor.enqueue("Index\tCampaign Name\t")
         for i, campaign in enumerate(Campaign.collection):
-            client.sendall(
-                f"{i}\t{campaign.name}\t{campaign.description}\n".encode())
+            monitor.enqueue(
+                f"{i}\t{campaign.name}\t{campaign.description}")

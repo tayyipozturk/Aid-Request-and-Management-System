@@ -1,8 +1,6 @@
 # Project
 
-Aid Request and Management System
-
-##
+## Aid Request and Management System
 
 This project consists of a user class with authorization login functions.
 A campaign consists request multiple requests.

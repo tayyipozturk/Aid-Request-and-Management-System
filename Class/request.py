@@ -41,7 +41,7 @@ class Request:
 
     def get(self):
         itemstext = ["{\"item\": "+x["item"]["data"].get()+",\"amount\": "+str(
-            x["item"]["amount"])+",\"delivered\": "+str(x["delivered"])+"}" for x in self.items_dict]
+            x["item"]["amount"])+"}" for x in self.items_dict]
         availibilitytext = ["{\"ma_id\": "+str(x["availibility"]["ma_id"])+",\"item\": "+str(x["availibility"]["item"])+",\"amount\": "+str(x["availibility"]["amount"])+",\"supplier\": "+x["availibility"]["supplier"].username +
                             ",\"expire\": "+str(x["availibility"]["expire"])+",\"geoloc\": "+str(x["availibility"]["geoloc"])+",\"comments\": "+x["availibility"]["comments"]+"}" for x in self.items_dict if x["availibility"] is not None]
         onroutetext = ["{\"ma_id\": "+str(x["onroute"]["ma_id"])+",\"item\": "+str(x["onroute"]["item"])+",\"amount\": "+str(x["onroute"]["amount"])+",\"supplier\": "+x["onroute"]["supplier"].username +

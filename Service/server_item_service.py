@@ -6,22 +6,22 @@ from Class.item import Item
 
 class ItemService:
     @staticmethod
-    def search_item(client, args):
+    def search_item(monitor, args):
         name = args.group("name")
         item = Item.search(name)
         if item is None:
-            client.sendall("Item does not exist".encode())
+            monitor.enqueue("Item does not exist")
             return
-        client.sendall(item.get().encode())
+        monitor.enqueue(item.get())
 
     @staticmethod
-    def update_item(client, args):
+    def update_item(monitor, args):
         target = args.group("target")
         name = args.group("name")
         synonyms = args.group("synonyms").split(" ")
         item = Item.search(target)
         if target is None:
-            client.sendall("Item does not exist".encode())
+            monitor.enqueue("Item does not exist")
             return
         if synonyms is None or len(synonyms) == 0:
             item.update(name=name)
@@ -29,10 +29,10 @@ class ItemService:
             item.update(name=name, synonyms=synonyms)
 
     @ staticmethod
-    def remove_item(client, args):
+    def remove_item(monitor, args):
         name = args.group("name")
         item = Item.find_one(name)
         if item is None:
-            client.sendall("Item does not exist".encode())
+            monitor.enqueue("Item does not exist")
             return
         item.delete()

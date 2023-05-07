@@ -72,7 +72,7 @@ class Campaign:
                         is_okay = False
                 if is_okay:
                     if watch["callback"] is not None:
-                        watch["callback"](f"WATCH MATCHED:\n{watch}".encode())
+                        watch["callback"](f"WATCH MATCHED:\n{watch}")
 
         return req_id
 
