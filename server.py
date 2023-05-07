@@ -249,11 +249,11 @@ class ClientThread(threading.Thread):
 
 
 if __name__ == "__main__":
+    # Example users
     user = User("bob", "bob@localhost", "Bob", "123")
     user2 = User("ken", "ken@localhost", "Ken", "123")
     user3 = User("ros", "ros@localhost", "Ros", "123")
-    campaign = Campaign("camp", "Here is the description")
-    campaign2 = Campaign("campaign2", "Here is the description 2")
+
     p = argparse.ArgumentParser()
     p.add_argument("--port", type=int)
 
