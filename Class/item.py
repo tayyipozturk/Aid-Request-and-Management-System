@@ -42,16 +42,10 @@ class Item:
         return None
 
     @staticmethod
-    def find_one(name=None, synonyms=None):
+    def find_one(name=None):
         # Return item object
         # If item not found, return None
-        if name is not None:
-            for item in Item.collection:
-                if name == item.name:
-                    return item
-        if synonyms is not None:
-            for item in Item.collection:
-                for synonym in item.synonyms:
-                    if synonym in synonyms:
-                        return item
+        for item in Item.collection:
+            if name == item.name or name in item.synonyms:
+                return item
         return None
