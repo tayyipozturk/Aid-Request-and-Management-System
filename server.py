@@ -1,10 +1,12 @@
 import socket
 import argparse
 import threading
+import uuid
 from Class.user import User
 from Service.server_main_service import ServerParser
 from Service.server_campaign_service import CampaignService
 from Service.server_item_service import ItemService
+from Service.server_request_service import RequestService
 from Class.campaign import Campaign
 from Class.request import Request
 from Class.item import Item
@@ -75,9 +77,9 @@ class ClientThread(threading.Thread):
                         print(f"{self.address} tried to close a campaign")
                     elif data[0] == "add_request":
                         if self.campaign:
-                            # add_request <n_items> <items>(<name> <amount>) <latitude> <longtitude> <urgency> <descr>
+                            # add_request <items>(<name> <amount>) <latitude> <longtitude> <urgency> <descr>
                             input_addRequest = re.search(
-                                "add_request (?P<n_items>[0-9]*) (?P<items>(([a-zA-Z0-9]*) ([0-9]*))+) (?P<latitude>[0-9]*) (?P<longtitude>[0-9]*) (?P<urgency>[a-zA-Z]*) (?P<descr>(.*)*)", input_data)
+                                "add_request (?P<items>(([a-zA-Z0-9]*) ([0-9]*))+) (?P<latitude>[0-9\.]*) (?P<longtitude>[0-9\.]*) (?P<urgency>[a-zA-Z]*) (?P<descr>(.*)*)", input_data)
 
                             if input_addRequest:
                                 CampaignService.add_request(
@@ -100,7 +102,7 @@ class ClientThread(threading.Thread):
                                 "Error".encode())
                     elif data[0] == "update_request":
                         input_updateRequest = re.search(
-                            "update_request (?P<n_items>[0-9]*) (?P<req_id>[a-zA-Z0-9\-]*) (?P<items>(([a-zA-Z0-9]*) ([0-9]*))+) (?P<latitude>[0-9]*) (?P<longtitude>[0-9]*) (?P<urgency>[a-zA-Z]*) (?P<descr>(.*)*)", input_data)
+                            "update_request (?P<req_id>[a-zA-Z0-9\-]*) (?P<items>(([a-zA-Z0-9]*) ([0-9]*))+) (?P<latitude>[0-9\.]*) (?P<longtitude>[0-9\.]*) (?P<urgency>[a-zA-Z]*) (?P<descr>(.*)*)", input_data)
                         if input_updateRequest:
                             try:
                                 CampaignService.update_request(
@@ -122,12 +124,12 @@ class ClientThread(threading.Thread):
                                 "Error".encode())
 
                     elif data[0] == "query":
-                        # n_items, items, rectangular, (latitude, longtitude), (latitude, longtitude), urgency
+                        # items, rectangular, (latitude, longtitude), (latitude, longtitude), urgency
                         input_queryRect = re.search(
-                            "query (?P<n_items>[0-9]*) (?P<items>([a-zA-Z0-9]*)*) 0 (?P<latitude1>[0-9]*) (?P<longtitude1>[0-9]*) (?P<latitude2>[0-9]*) (?P<longtitude2>[0-9]*) (?P<urgency>[a-zA-Z]*)", input_data)
-                        # n_items, items, circular, (latitude, longtitude, radius), urgency
+                            "query (?P<items>([a-zA-Z0-9]*)*) 0 (?P<latitude1>[0-9\.]*) (?P<longtitude1>[0-9\.]*) (?P<latitude2>[0-9\.]*) (?P<longtitude2>[0-9\.]*) (?P<urgency>[a-zA-Z]*)", input_data)
+                        # items, circular, (latitude, longtitude, radius), urgency
                         input_queryCirc = re.search(
-                            "query (?P<n_items>[0-9]*) (?P<items>([a-zA-Z0-9]*)*) 1 (?P<latitude>[0-9]*) (?P<longtitude>[0-9]*) (?P<radius>[0-9]*) (?P<urgency>[a-zA-Z]*)", input_data)
+                            "query (?P<items>([a-zA-Z0-9]*)*) 1 (?P<latitude>[0-9\.]*) (?P<longtitude>[0-9\.]*) (?P<radius>[0-9]*) (?P<urgency>[a-zA-Z]*)", input_data)
 
                         if input_queryRect:
                             CampaignService.query(
@@ -139,12 +141,12 @@ class ClientThread(threading.Thread):
                             self.client_socket.sendall(
                                 "Error".encode())
                     elif data[0] == "watch":
-                        # n_items, items, rectangular, (latitude, longtitude), (latitude, longtitude), urgency
+                        # items, rectangular, (latitude, longtitude), (latitude, longtitude), urgency
                         input_watchRect = re.search(
-                            "watch (?P<n_items>[0-9]*) (?P<items>([a-zA-Z0-9]*)*) 0 (?P<latitude1>[0-9]*) (?P<longtitude1>[0-9]*) (?P<latitude2>[0-9]*) (?P<longtitude2>[0-9]*) (?P<urgency>[a-zA-Z]*)", input_data)
-                        # n_items, items, circular, (latitude, longtitude, radius), urgency
+                            "watch (?P<items>([a-zA-Z0-9]*)*) 0 (?P<latitude1>[0-9\.]*) (?P<longtitude1>[0-9\.]*) (?P<latitude2>[0-9\.]*) (?P<longtitude2>[0-9\.]*) (?P<urgency>[a-zA-Z]*)", input_data)
+                        # items, circular, (latitude, longtitude, radius), urgency
                         input_watchCirc = re.search(
-                            "watch (?P<n_items>[0-9]*) (?P<items>([a-zA-Z0-9]*)*) 1 (?P<latitude>[0-9]*) (?P<longtitude>[0-9]*) (?P<radius>[0-9]*) (?P<urgency>[a-zA-Z]*)", input_data)
+                            "watch (?P<items>([a-zA-Z0-9]*)*) 1 (?P<latitude>[0-9\.]*) (?P<longtitude>[0-9\.]*) (?P<radius>[0-9]*) (?P<urgency>[a-zA-Z]*)", input_data)
 
                         if input_watchRect:
                             watch_id = CampaignService.watch(
@@ -158,7 +160,43 @@ class ClientThread(threading.Thread):
                             self.client_socket.sendall(
                                 "Error".encode())
                     elif data[0] == "unwatch":
-                        pass
+                        input_unwatch = re.search(
+                            "unwatch (?P<id>[a-zA-Z0-9\-]*)", input_data)
+                        if input_unwatch:
+                            id_uuid = uuid.UUID(input_unwatch.group("id"))
+                            if id_uuid in self.watches:
+                                CampaignService.unwatch(
+                                    self.client_socket, id_uuid, self.campaign)
+                                self.watches.remove(id_uuid)
+                        else:
+                            self.client_socket.sendall("Error".encode())
+                    elif data[0] == "mark_available":
+                        input_markAvailable = re.search(
+                            "mark_available (?P<id>[a-zA-Z0-9\-]*) (?P<items>(([a-zA-Z0-9]*) ([0-9]*))+) (?P<expire>[0-9]*) (?P<latitude>[0-9\.]*) (?P<longtitude>[0-9\.]*) (?P<comment>(.*)*)", input_data)
+                        if input_markAvailable:
+                            RequestService.mark_available(
+                                self.client_socket, input_markAvailable, self.campaign, self.token)
+                        else:
+                            self.client_socket.sendall(
+                                "Error".encode())
+                    elif data[0] == "pick":
+                        input_pick = re.search(
+                            "pick (?P<req_id>[a-zA-Z0-9\-]*) (?P<ma_id>[a-zA-Z0-9\-]*) (?P<items>(([a-zA-Z0-9]*) ([0-9]*))+)", input_data)
+                        if input_pick:
+                            RequestService.pick(
+                                self.client_socket, input_pick, self.campaign, self.token)
+                        else:
+                            self.client_socket.sendall(
+                                "Error".encode())
+                    elif data[0] == "arrived":
+                        input_arrived = re.search(
+                            "arrived (?P<req_id>[a-zA-Z0-9\-]*) (?P<ma_id>[a-zA-Z0-9\-]*)", input_data)
+                        if input_arrived:
+                            RequestService.arrived(
+                                self.client_socket, input_arrived, self.campaign)
+                        else:
+                            self.client_socket.sendall(
+                                "Error".encode())
                     elif data[0] == "search_item":
                         input_searchItem = re.search(
                             "search_item (?P<name>[a-zA-Z0-9]*)", input_data)
@@ -208,14 +246,10 @@ class ClientThread(threading.Thread):
         self.client_socket.close()
 
 
-def handle_request(request):
-    # process the request and return a response
-    return "Hello, World!"
-
-
 if __name__ == "__main__":
-    requester = User("bob", "bob@localhost", "Bob", "123")
-    requester = User("mmm", "bob@localhost", "Bob", "123")
+    user = User("bob", "bob@localhost", "Bob", "123")
+    user2 = User("ken", "ken@localhost", "Ken", "123")
+    user3 = User("ros", "ros@localhost", "Ros", "123")
     campaign = Campaign("camp", "Here is the description")
     campaign2 = Campaign("campaign2", "Here is the description 2")
     p = argparse.ArgumentParser()
@@ -231,10 +265,5 @@ if __name__ == "__main__":
     print(f"Server listening on port {PORT}...")
     while True:
         client_socket, address = server_socket.accept()
-        # data = client_socket.recv(1024).decode()
-        # if data:
-        #     # handle the received data
-        #     response = handle_request(data)
-        #     self.client_socket.sendall(response.encode())
         new_thread = ClientThread(client_socket, address)
         new_thread.start()

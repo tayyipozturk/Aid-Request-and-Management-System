@@ -1,27 +1,35 @@
+import threading
+
+
 class Item:
     collection = []
+    mutex = threading.Lock()
 
     def __init__(self, name, synonyms=[]):
         self.name = name
         self.synonyms = synonyms        # List of synonyms
+        self.mutex = threading.Lock()
         Item.collection.append(self)
 
     def get(self):
         # Return item as json
-        return '{"name":"' + self.name + '","synonyms":"' + str(self.synonyms) + '"}'
+        with self.mutex:
+            return '{"name":"' + self.name + '","synonyms":"' + str(self.synonyms) + '"}'
 
     def update(self, name=None, synonyms=None):
         # Update item with new values
-        if name is not None:
-            self.name = name
-        if synonyms is not None:
-            self.synonyms = synonyms
+        with self.mutex:
+            if name is not None:
+                self.name = name
+            if synonyms is not None:
+                self.synonyms = synonyms
 
     def delete(self):
         # Remove item from collection
         # Delete item
-        Item.collection.remove(self)
-        del self
+        with Item.mutex:
+            Item.collection.remove(self)
+            del self
 
     @staticmethod
     def search(name):

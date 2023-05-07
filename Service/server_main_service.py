@@ -21,27 +21,6 @@ class ServerParser:
             else:
                 client.sendall("Login failed".encode())
         return None
-        '''
-        if len(args) > 0:
-            if args[0] == "login":
-                if len(args) == 3:
-                    print(args)
-                    token = User.login(args[1], args[2])
-                    print(token)
-                    if token:
-                        client.sendall(
-                            f"Login successful. Token: {token}".encode())
-                        return token
-                    else:
-                        client.sendall("Login failed".encode())
-                else:
-                    client.sendall("Invalid number of arguments".encode())
-            else:
-                client.sendall("Invalid command".encode())
-        else:
-            client.sendall("No arguments provided".encode())
-        return None
-    '''
 
     @staticmethod
     def logout(client, token):

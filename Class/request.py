@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
+import threading
 
 # "items" inputs are a list of following dictionary
 # {
@@ -35,6 +36,7 @@ class Request:
         self.urgency = urgency
         self.comments = comments
         self.status = 'OPEN'
+        self.mutex = threading.Lock()
         Request.collection.append(self)
 
     def get(self):
@@ -99,12 +101,13 @@ class Request:
     def markavailable(self, user, items, expire, geoloc, comments):
         # If there is no reserved availibility or the reserved availibility is expired, add a new availibility
         # Return unique ma_id
-        ma_id = uuid.uuid4()
+        ma_id = None
 
         for i, itemi in enumerate(items):
             for j, itemj in enumerate(self.items_dict):
                 if itemj["item"]["data"] == itemi["data"]:
                     if itemj["availibility"] is None or itemj["availibility"]["expire"] < datetime.now():
+                        ma_id = uuid.uuid4()
                         self.items_dict[j]["availibility"] = {"ma_id": ma_id, "item": itemi["data"].name, "amount": itemi["amount"], "supplier": user, "expire": (
                             datetime.now() + timedelta(hours=int(expire))), "geoloc": geoloc, "comments": comments}
                     break

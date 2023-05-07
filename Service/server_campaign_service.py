@@ -10,7 +10,6 @@ class CampaignService:
     @staticmethod
     def add_request(client, args, campaign, token):
         item_list = re.findall("([a-zA-Z0-9]+) ([0-9]+)", args.group("items"))
-        num_items = args.group("n_items")
         latitude = float(args.group("latitude"))
         longtitude = float(args.group("longtitude"))
         urgency = args.group("urgency")
@@ -18,13 +17,12 @@ class CampaignService:
         items = []
         geoloc = [longtitude, latitude]
 
-        with campaign.mutex:
-            for it in item_list:
-                item = it
+        for it in item_list:
+            item = it
+            item_test = Item.search(item[0])
+            if item_test is None:
                 item_test = Item.search(item[0])
-                if item_test is None:
-                    item_test = Item.search(item[0])
-                items.append({"data": item_test, "amount": int(item[1])})
+            items.append({"data": item_test, "amount": int(item[1])})
         username = User.find_one(token=token).username
         request = Request(username, items, geoloc, urgency, comments)
         with campaign.mutex:
@@ -33,7 +31,6 @@ class CampaignService:
 
     @staticmethod
     def get_request(client, args, campaign):
-        print(args.groupdict())
         id = args.group("id")
         with campaign.mutex:
             request = campaign.getrequest(id)
@@ -45,7 +42,6 @@ class CampaignService:
     @staticmethod
     def update_request(client, args, campaign, token):
         items_list = re.findall("([a-zA-Z0-9]+) ([0-9]+)", args.group("items"))
-        num_items = args.group("n_items")
         latitude = float(args.group("latitude"))
         longtitude = float(args.group("longtitude"))
         urgency = args.group("urgency")
@@ -61,8 +57,6 @@ class CampaignService:
                 items.append({"data": item_test, "amount": int(item[1])})
         username = User.find_one(token=token).username
         request = Request(username, items, geoloc, urgency, comments)
-        print(request.items_dict)
-        print(request)
         with campaign.mutex:
             campaign.updaterequest(req_id, request)
             client.sendall(f"Request updated successfully: {req_id}".encode())
@@ -75,7 +69,6 @@ class CampaignService:
 
     def query(client, args, campaign, type):
         item_list = re.findall("([a-zA-Z0-9]+)", args.group("items"))
-        num_items = args.group("n_items")
         urgency = args.group("urgency")
 
         items = []
@@ -100,15 +93,17 @@ class CampaignService:
             center = [longtitude, latitude]
             geoloc = {'type': 1, 'values': [center, radius]}
 
-        returnList = campaign.query(items, geoloc, urgency)
+        returnList = None
+        with campaign.mutex:
+            returnList = campaign.query(items, geoloc, urgency)
 
-        for request in returnList:
-            client.sendall(request.get().encode())
+        if returnList is None:
+            for request in returnList:
+                client.sendall(request.get().encode())
         return
 
     def watch(client, args, campaign, type):
         item_list = re.findall("([a-zA-Z0-9]+)", args.group("items"))
-        num_items = args.group("n_items")
         urgency = args.group("urgency")
         watchid = None
 
@@ -134,17 +129,26 @@ class CampaignService:
             center = [longtitude, latitude]
             geoloc = {'type': 1, 'values': [center, radius]}
 
-        watchid = campaign.watch(client.sendall, items, geoloc, urgency)
+        with campaign.mutex:
+            watchid = campaign.watch(client.sendall, items, geoloc, urgency)
         if watchid is None:
             client.sendall("Error: Watch not added".encode())
         else:
             client.sendall(f"Watch added successfully: {watchid}".encode())
         return watchid
 
-    def unwatch(client, args, campaign):
-        watchid = args.group("watchid")
-        if campaign.unwatch(watchid):
+    def unwatch(client, watchid, campaign):
+        result = None
+        with campaign.mutex:
+            result = campaign.unwatch(watchid)
+        if result:
             client.sendall(f"Watch removed successfully: {watchid}".encode())
         else:
             client.sendall("Error: Watch not removed".encode())
         return
+
+    def callback(client, args, campaign):
+        id = args.group("id")
+        with campaign.mutex:
+            campaign.callback(id)
+            client.sendall(f"Callback called successfully: {id}".encode())

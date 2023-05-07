@@ -108,9 +108,6 @@ class Campaign:
         return False
 
     def getrequest(self, requestid):
-        print("------")
-        print(self.requests)
-        print("------")
         # Try to get request and return it
         for request in self.requests:
             check_val = request["req_id"]
@@ -118,7 +115,6 @@ class Campaign:
                 check_val = str(check_val)
             if check_val == requestid:
                 return request["data"].get()
-        print("Request not found.")
         return None
 
     def query(self, item=None, loc=None, urgency=None):
@@ -192,6 +188,16 @@ class Campaign:
                 self.watches.pop(i)
                 return True
         return False
+
+    def findrequest(self, req_id):
+        # Return the request if it is in the list
+        for req in self.requests:
+            check_val = req["req_id"]
+            if isinstance(req_id, str):
+                check_val = str(check_val)
+            if check_val == req_id:
+                return req
+        return None
 
     @staticmethod
     def find_one(name):
