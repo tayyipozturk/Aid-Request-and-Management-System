@@ -27,6 +27,7 @@ class ItemService:
             item.update(name=name)
         else:
             item.update(name=name, synonyms=synonyms)
+        monitor.enqueue("Item updated")
 
     @ staticmethod
     def remove_item(monitor, args):

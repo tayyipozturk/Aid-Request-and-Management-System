@@ -204,7 +204,7 @@ class ClientThread(threading.Thread):
                         items = []
                         for t in range(int(item_count)):
                             items.append(data[3 + t])
-                        watchType = data[3 + int(item_count)]
+                        watchType = int(data[3 + int(item_count)])
 
                         if watchType == 0:
                             latitude1 = data[4 + int(item_count)]
@@ -277,7 +277,7 @@ class ClientThread(threading.Thread):
                         print(f"{targetUser['username']} tried to search an item")
                     elif data[1] == "update_item":
                         input_updateItem = re.search(
-                            "(?P<token>[a-zA-Z0-9]*) update_item (?P<target>[a-zA-Z0-9]*) (?P<name>[a-zA-Z0-9]*)( )?(?P<synonyms>(.*)*)",
+                            "(?P<token>[a-zA-Z0-9]*) update_item (?P<target>[a-zA-Z0-9]*) (?P<name>[a-zA-Z0-9]*) (?P<synonyms>(.*)*)",
                             input_data)
                         print(input_updateItem)
                         if input_updateItem:
