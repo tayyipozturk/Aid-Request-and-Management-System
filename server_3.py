@@ -169,39 +169,63 @@ class ClientThread(threading.Thread):
 
                     elif data[1] == "query":
                         # items, rectangular, (latitude, longtitude), (latitude, longtitude), urgency
-                        input_queryRect = re.search(
-                            "(?P<token>[a-zA-Z0-9]*) query (?P<items>([a-zA-Z0-9]*)*) 0 (?P<latitude1>[0-9\.]*) (?P<longtitude1>[0-9\.]*) (?P<latitude2>[0-9\.]*) (?P<longtitude2>[0-9\.]*) (?P<urgency>[a-zA-Z]*)",
-                            input_data)
-                        # items, circular, (latitude, longtitude, radius), urgency
-                        input_queryCirc = re.search(
-                            "(?P<token>[a-zA-Z0-9]*) query (?P<items>([a-zA-Z0-9]*)*) 1 (?P<latitude>[0-9\.]*) (?P<longtitude>[0-9\.]*) (?P<radius>[0-9]*) (?P<urgency>[a-zA-Z]*)",
-                            input_data)
+                        arg = {}
+                        item_count = data[2]
+                        items = []
+                        for t in range(int(item_count)):
+                            items.append(data[3 + t])
+                        queryType = data[3 + int(item_count)]
 
-                        if input_queryRect:
+                        if queryType == 0:
+                            latitude1 = data[4 + int(item_count)]
+                            longitude1 = data[5 + int(item_count)]
+                            latitude2 = data[6 + int(item_count)]
+                            longitude2 = data[7 + int(item_count)]
+                            urgency = data[8 + int(item_count)]
+                            arg = {'items': items, 'latitude1': latitude1, 'longitude1': longitude1,
+                                      'latitude2': latitude2, 'longitude2': longitude2, 'urgency': urgency}
                             CampaignService.query(
-                                targetUser['watch_monitor'], input_queryRect, targetUser['campaign'], "rect")
-                        elif input_queryCirc:
+                                targetUser['watch_monitor'], arg, targetUser['campaign'], "rect")
+                        elif queryType == 1:
+                            latitude = data[4 + int(item_count)]
+                            longitude = data[5 + int(item_count)]
+                            radius = data[6 + int(item_count)]
+                            urgency = data[7 + int(item_count)]
+                            arg = {'items': items, 'latitude': latitude, 'longitude': longitude,
+                                        'radius': radius, 'urgency': urgency}
                             CampaignService.query(
-                                targetUser['watch_monitor'], input_queryCirc, targetUser['campaign'], "circ")
+                                targetUser['watch_monitor'], arg, targetUser['campaign'], "circ")
                         else:
                             targetUser['watch_monitor'].enqueue("Error query")
                     elif data[1] == "watch":
                         # items, rectangular, (latitude, longtitude), (latitude, longtitude), urgency
-                        input_watchRect = re.search(
-                            "(?P<token>[a-zA-Z0-9]*) watch (?P<items>([a-zA-Z0-9]*)*) 0 (?P<latitude1>[0-9\.]*) (?P<longtitude1>[0-9\.]*) (?P<latitude2>[0-9\.]*) (?P<longtitude2>[0-9\.]*) (?P<urgency>[a-zA-Z]*)",
-                            input_data)
-                        # items, circular, (latitude, longtitude, radius), urgency
-                        input_watchCirc = re.search(
-                            "(?P<token>[a-zA-Z0-9]*) watch (?P<items>([a-zA-Z0-9]*)*) 1 (?P<latitude>[0-9\.]*) (?P<longtitude>[0-9\.]*) (?P<radius>[0-9]*) (?P<urgency>[a-zA-Z]*)",
-                            input_data)
+                        arg = {}
+                        item_count = data[2]
+                        items = []
+                        for t in range(int(item_count)):
+                            items.append(data[3 + t])
+                        watchType = data[3 + int(item_count)]
 
-                        if input_watchRect:
+                        if watchType == 0:
+                            latitude1 = data[4 + int(item_count)]
+                            longitude1 = data[5 + int(item_count)]
+                            latitude2 = data[6 + int(item_count)]
+                            longitude2 = data[7 + int(item_count)]
+                            urgency = data[8 + int(item_count)]
+                            arg = {'items': items, 'latitude1': latitude1, 'longitude1': longitude1,
+                                   'latitude2': latitude2, 'longitude2': longitude2, 'urgency': urgency}
                             watch_id = CampaignService.watch(
-                                targetUser['watch_monitor'], input_watchRect, targetUser['campaign'], "rect")
+                                targetUser['watch_monitor'], arg, targetUser['campaign'], "rect")
                             targetUser['watches'].append(watch_id)
-                        elif input_watchCirc:
+                        elif watchType == 1:
+                            latitude = data[4 + int(item_count)]
+                            longitude = data[5 + int(item_count)]
+                            radius = data[6 + int(item_count)]
+                            urgency = data[7 + int(item_count)]
+                            arg = {'items': items, 'latitude': latitude, 'longitude': longitude,
+                                   'radius': radius, 'urgency': urgency}
                             watch_id = CampaignService.watch(
-                                targetUser['watch_monitor'], input_watchCirc, targetUser['campaign'], "circ")
+                                targetUser['watch_monitor'], arg, targetUser['campaign'], "circ")
                             targetUser['watches'].append(watch_id)
                         else:
                             targetUser['watch_monitor'].enqueue("Error watch")
