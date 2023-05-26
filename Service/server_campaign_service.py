@@ -112,6 +112,7 @@ class CampaignService:
         if returnList is not None:
             for request in returnList:
                 result += str(request.get()) + "\n"
+            monitor.enqueue(result)
         else:
             monitor.enqueue("No requests found")
         return
