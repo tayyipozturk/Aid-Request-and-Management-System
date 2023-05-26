@@ -270,12 +270,11 @@ class ClientThread(threading.Thread):
                         else:
                             targetUser['watch_monitor'].enqueue("Error remove_item")
                     elif data[1] == "logout":
-                        if index:
-                            target = User.find_one(token=token)
-                            target.logout()
-                            targetUser['watch_monitor'].enqueue("Logout successful")
-                            userList.pop(index)
-                            return True
+                        target = User.find_one(token=token)
+                        target.logout()
+                        targetUser['watch_monitor'].enqueue("Logout successful")
+                        userList.pop(index)
+                        return True
                         print("Invalid token for logout")
                         return False
                     else:

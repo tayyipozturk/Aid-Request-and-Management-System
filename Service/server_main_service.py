@@ -51,7 +51,7 @@ class ServerParser:
         if len(name) > 0:
             campaign = Campaign.find_one(name)
             if campaign:
-                monitor.enqueue("Campaign opened")
+                #monitor.enqueue("Campaign opened")
                 return campaign
             else:
                 monitor.enqueue("Campaign not found")
@@ -71,7 +71,7 @@ class ServerParser:
 
     @staticmethod
     def list(monitor, args):
-        monitor.enqueue("Index\tCampaign Name\t")
+        result = ""
         for i, campaign in enumerate(Campaign.collection):
-            monitor.enqueue(
-                f"{i}\t{campaign.name}\t{campaign.description}")
+            result += f"({i},{campaign.name},{campaign.description})"
+        monitor.enqueue(f"{result}")

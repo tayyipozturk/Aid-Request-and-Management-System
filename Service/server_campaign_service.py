@@ -33,7 +33,10 @@ class CampaignService:
     def get_all_requests(monitor, campaign):
         with campaign.mutex:
             requests = campaign.get_all_requests()
-            monitor.enqueue(requests)
+            if requests != "":
+                monitor.enqueue(requests)
+            else:
+                monitor.enqueue("No requests found")
 
     @staticmethod
     def get_request(monitor, args, campaign):
@@ -104,9 +107,12 @@ class CampaignService:
         with campaign.mutex:
             returnList = campaign.query(items, geoloc, urgency)
 
-        if returnList is None:
+        result = ""
+        if returnList is not None:
             for request in returnList:
-                monitor.enqueue(request.get())
+                result += str(request.get()) + "\n"
+        else:
+            monitor.enqueue("No requests found")
         return
 
     def watch(monitor, args, campaign, type):
