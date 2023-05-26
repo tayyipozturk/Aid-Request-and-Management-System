@@ -26,7 +26,7 @@ class CampaignService:
         username = User.find_one(token=token).username
         request = Request(username, items, geoloc, urgency, comments)
         with campaign.mutex:
-            req_id = campaign.addrequest(request)
+            req_id = campaign.addrequest(request, token)
             monitor.enqueue(f"Request added successfully: {req_id}")
 
     @staticmethod

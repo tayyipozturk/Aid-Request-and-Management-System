@@ -24,7 +24,7 @@ class Campaign:
         Campaign.collection.append(self)
         self.mutex = threading.Lock()
 
-    def addrequest(self, request):
+    def addrequest(self, request, token):
         # request is a Request object
         # return the req_id
         req_id = uuid.uuid4()
@@ -72,7 +72,7 @@ class Campaign:
                         is_okay = False
                 if is_okay:
                     if watch["callback"] is not None:
-                        watch["callback"](f"WATCH MATCHED:\n{watch}")
+                        watch["callback"](f"WATCH MATCHED:\n{watch}\nTOKEN: {token}\n")
 
         return req_id
 
