@@ -108,8 +108,8 @@ class CampaignService:
         with campaign.mutex:
             returnList = campaign.query(items, geoloc, urgency)
 
-        result = ""
         if returnList is not None:
+            result = ""
             for request in returnList:
                 result += str(request.get()) + "\n"
             monitor.enqueue(result)

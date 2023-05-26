@@ -174,7 +174,7 @@ class ClientThread(threading.Thread):
                         items = []
                         for t in range(int(item_count)):
                             items.append(data[3 + t])
-                        queryType = data[3 + int(item_count)]
+                        queryType = int(data[3 + int(item_count)])
 
                         if queryType == 0:
                             latitude1 = data[4 + int(item_count)]
