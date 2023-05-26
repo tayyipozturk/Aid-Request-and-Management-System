@@ -49,3 +49,7 @@ class Item:
             if name == item.name or name in item.synonyms:
                 return item
         return None
+
+    @staticmethod
+    def find_all():
+        return Item.collection

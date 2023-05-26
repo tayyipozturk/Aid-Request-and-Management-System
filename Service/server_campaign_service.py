@@ -30,6 +30,12 @@ class CampaignService:
             monitor.enqueue(f"Request added successfully: {req_id}")
 
     @staticmethod
+    def get_all_requests(monitor, campaign):
+        with campaign.mutex:
+            requests = campaign.get_all_requests()
+            monitor.enqueue(requests)
+
+    @staticmethod
     def get_request(monitor, args, campaign):
         id = args.group("id")
         with campaign.mutex:

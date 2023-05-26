@@ -205,3 +205,7 @@ class Campaign:
             if campaign.name == name:
                 return campaign
         return None
+
+    def get_all_requests(self):
+        requests = [request['data'].get() for request in self.requests]
+        return "\n".join([str(request) for request in requests])
