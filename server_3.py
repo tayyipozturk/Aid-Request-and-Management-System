@@ -31,12 +31,12 @@ import re
 # <token> update_item <name> <descr>
 # <token> delete_item <name>
 
+userList = []
 class ClientThread(threading.Thread):
     def __init__(self, client_socket, address):
         threading.Thread.__init__(self)
         self.client_socket = client_socket
         self.address = address
-        self.userList = []
         print(f"New connection from {self.address}")
 
     def run(self):
@@ -61,12 +61,12 @@ class ClientThread(threading.Thread):
 
                     logged = {"username": username, "token": token, "campaign": None,
                               "watches": [], "watch_monitor": watch_monitor}
-                    self.userList.append(logged)
+                    userList.append(logged)
                     print(f"{username} logged in")
                 else:
                     token = data[0]
                     index = self.find_user(token)
-                    targetUser = self.userList[index]
+                    targetUser = userList[index]
                     if data[1] == "new":
                         input_new = re.search(
                             "(?P<token>[a-zA-Z0-9]*) new (?P<name>[a-zA-Z0-9]*) (?P<descr>(.*)*)", input_data)
@@ -274,7 +274,7 @@ class ClientThread(threading.Thread):
                             target = User.find_one(token=token)
                             target.logout()
                             targetUser['watch_monitor'].enqueue("Logout successful")
-                            self.userList.pop(index)
+                            userList.pop(index)
                             return True
                         print("Invalid token for logout")
                         return False
@@ -295,7 +295,7 @@ class ClientThread(threading.Thread):
 
     def find_user(self, token):
         index = 0
-        for element in self.userList:
+        for element in userList:
             if element["token"] == token:
                 return index
             index += 1
