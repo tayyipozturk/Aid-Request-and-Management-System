@@ -79,6 +79,7 @@ class CampaignService:
 
     def query(monitor, args, campaign, type):
         item_list = re.findall("([a-zA-Z0-9]+)", args.group("items"))
+        geoloc = ""
         urgency = args.group("urgency")
 
         items = []

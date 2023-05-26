@@ -207,5 +207,5 @@ class Campaign:
         return None
 
     def get_all_requests(self):
-        requests = [request['data'].get() for request in self.requests]
+        requests = [request['req_id'] for request in self.requests]
         return "\n".join([str(request) for request in requests])
