@@ -274,9 +274,6 @@ class ClientThread(threading.Thread):
                         target.logout()
                         targetUser['watch_monitor'].enqueue("Logout successful")
                         userList.pop(index)
-                        return True
-                        print("Invalid token for logout")
-                        return False
                     else:
                         targetUser['watch_monitor'].enqueue("Invalid command")
                         print(
