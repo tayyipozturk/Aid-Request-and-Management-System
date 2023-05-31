@@ -46,7 +46,7 @@ class Request:
                             ",\"expire\": "+str(x["availibility"]["expire"])+",\"geoloc\": "+str(x["availibility"]["geoloc"])+",\"comments\": "+x["availibility"]["comments"]+"}" for x in self.items_dict if x["availibility"] is not None]
         onroutetext = ["{\"ma_id\": "+str(x["onroute"]["ma_id"])+",\"item\": "+str(x["onroute"]["item"])+",\"amount\": "+str(x["onroute"]["amount"])+",\"supplier\": "+x["onroute"]["supplier"].username +
                        ",\"expire\": "+str(x["onroute"]["expire"])+",\"geoloc\": "+str(x["onroute"]["geoloc"])+",\"comments\": "+x["onroute"]["comments"]+"}" for x in self.items_dict if x["onroute"] is not None]
-        return '{"owner":"' + self.owner + '","items":"' + str(itemstext) + '","geoloc":"' + str(self.geoloc) + '","urgency":"' + self.urgency + '","comments":"' + self.comments + '","status":"' + self.status + '","availibility":"' + str(availibilitytext) + '","onroute":"' + str(onroutetext) + '"}'
+        return '{"owner":"' + self.owner + '","items":' + str(itemstext) + ',"geoloc":' + str(self.geoloc) + ',"urgency":"' + self.urgency + '","comments":"' + self.comments + '","status":"' + self.status + '","availibility":' + str(availibilitytext) + ',"onroute":' + str(onroutetext) + '}'
 
     def update(self, owner=None, items=None, geoloc=None, urgency=None, comments=None):
         # Check if the new items are compatible with onroute
