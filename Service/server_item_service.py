@@ -37,3 +37,4 @@ class ItemService:
             monitor.enqueue("Item does not exist")
             return
         item.delete()
+        monitor.enqueue("Item removed")
