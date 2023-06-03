@@ -120,6 +120,7 @@ class CampaignService:
     def watch(monitor, args, campaign, type):
         item_list = args["items"]
         urgency = args["urgency"]
+        token = args["token"]
 
         items = []
         for it in item_list:
@@ -128,6 +129,7 @@ class CampaignService:
                 found_item = Item.search(it)
             items.append(found_item)
 
+        geoloc = {}
         if type == "rect":
             latitude1 = float(args.group("latitude1"))
             longtitude1 = float(args.group("longtitude1"))
@@ -144,7 +146,7 @@ class CampaignService:
             geoloc = {'type': 1, 'values': [center, radius]}
 
         with campaign.mutex:
-            watchid = campaign.watch(monitor.enqueue, items, geoloc, urgency)
+            watchid = campaign.watch(monitor.enqueue, items, geoloc, urgency, token)
         if watchid is None:
             monitor.enqueue("Error: Watch not added")
         else:
@@ -159,4 +161,22 @@ class CampaignService:
             monitor.enqueue(f"Watch removed successfully: {watchid}")
         else:
             monitor.enqueue("Error: Watch not removed")
+        return
+
+    def get_watches(monitor, campaign, token):
+        result = []
+        retVal = []
+        with campaign.mutex:
+            result = campaign.watches
+        if len(result) == 0:
+            monitor.enqueue("No watches found")
+        else:
+            for watch in result:
+                if watch["token"] == token:
+                    retVal.append(watch["watch_id"])
+            if len(retVal) == 0:
+                monitor.enqueue("No watches found")
+            else:
+                # return in a type of {"values": [watchid1, watchid2, ...]}
+                monitor.enqueue({"values": str(retVal)})
         return

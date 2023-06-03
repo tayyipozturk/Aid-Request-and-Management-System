@@ -202,6 +202,7 @@ class ClientThread(threading.Thread):
                     elif data[1] == "watch":
                         # items, rectangular, (latitude, longtitude), (latitude, longtitude), urgency
                         arg = {}
+                        token = data[0]
                         item_count = data[2]
                         items = []
                         for t in range(int(item_count)):
@@ -215,7 +216,7 @@ class ClientThread(threading.Thread):
                             longitude2 = data[7 + int(item_count)]
                             urgency = data[8 + int(item_count)]
                             arg = {'items': items, 'latitude1': latitude1, 'longitude1': longitude1,
-                                   'latitude2': latitude2, 'longitude2': longitude2, 'urgency': urgency}
+                                   'latitude2': latitude2, 'longitude2': longitude2, 'urgency': urgency, 'token': token}
                             watch_id = CampaignService.watch(
                                 targetUser['watch_monitor'], arg, targetUser['campaign'], "rect")
                             targetUser['watches'].append(watch_id)
@@ -225,7 +226,7 @@ class ClientThread(threading.Thread):
                             radius = data[6 + int(item_count)]
                             urgency = data[7 + int(item_count)]
                             arg = {'items': items, 'latitude': latitude, 'longitude': longitude,
-                                   'radius': radius, 'urgency': urgency}
+                                   'radius': radius, 'urgency': urgency, 'token': token}
                             watch_id = CampaignService.watch(
                                 targetUser['watch_monitor'], arg, targetUser['campaign'], "circ")
                             targetUser['watches'].append(watch_id)
@@ -295,6 +296,13 @@ class ClientThread(threading.Thread):
                                 targetUser['watch_monitor'], input_removeItem)
                         else:
                             targetUser['watch_monitor'].enqueue("Error remove_item")
+                    elif data[1] == "get_watches":
+                        token = data[0]
+                        input_getWatches = re.search(
+                            "(?P<token>[a-zA-Z0-9]*) get_watches", input_data)
+                        if input_getWatches:
+                            CampaignService.get_watches(
+                                targetUser['watch_monitor'], targetUser['campaign'], token)
                     elif data[1] == "logout":
                         target = User.find_one(token=token)
                         target.logout()

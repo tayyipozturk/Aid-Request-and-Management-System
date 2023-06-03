@@ -5,7 +5,7 @@ import threading
 # "self.name" is a String
 # "self.description" is a String
 # "self.requests" is a list of {"req_id": req_id, "data": request}
-# "self.watches" is a list of {"watch_id": watch_id, "callback": callback, "item": item, "loc": loc, "urgency": urgency}
+# "self.watches" is a list of {"watch_id": watch_id, "callback": callback, "item": item, "loc": loc, "urgency": urgency, "token": token}
 
 
 class Campaign:
@@ -172,13 +172,13 @@ class Campaign:
                     returnList.append(request["data"])
         return returnList
 
-    def watch(self, callback=None, item=None, loc=None, urgency=None):
+    def watch(self, callback=None, item=None, loc=None, urgency=None, token=None):
         # Add a watcher with callback function to the list
         # item is a list of Item object
         # Return the watch_id
         watch_id = uuid.uuid4()
         self.watches.append({"watch_id": watch_id, "callback": callback,
-                            "item": item, "loc": loc, "urgency": urgency})
+                            "item": item, "loc": loc, "urgency": urgency, "token": token})
         return watch_id
 
     def unwatch(self, watchid):
