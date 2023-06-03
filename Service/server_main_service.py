@@ -73,8 +73,11 @@ class ServerParser:
     def list(monitor, args):
         # create a json to send, eg: '{"values": ["name", "description"], ["name", "description"]}'
         campaigns = Campaign.collection
-        monitor.enqueue('{ "values": [')
+        result = '{ "values": ['
+        campaign_list = ''
         for campaign in campaigns:
-            monitor.enqueue('{ "name": "' + campaign.name + '", "description": "' + campaign.description + '" },')
-        monitor.enqueue(']}')
+            campaign_list += '{ "name": "' + campaign.name + '", "description": "' + campaign.description + '" },'
+        campaign_list = campaign_list[:-1]
+        result += campaign_list + ']}'
+        monitor.enqueue(result)
 
