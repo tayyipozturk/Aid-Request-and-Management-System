@@ -78,8 +78,9 @@ class CampaignService:
             monitor.enqueue(f"Request removed successfully: {id}")
 
     def query(monitor, args, campaign, type):
-        item_list = args["items"]
-        urgency = args["urgency"]
+        item_list = re.findall("([a-zA-Z0-9]+)", args.group("items"))
+        geoloc = ""
+        urgency = args.group("urgency")
 
         items = []
         for it in item_list:
@@ -88,20 +89,19 @@ class CampaignService:
                 found_item = Item.search(it)
             items.append(found_item)
 
-        geoloc = ""
         if type == "rect":
-            latitude1 = float(args["latitude1"])
-            longitude1 = float(args["longitude1"])
-            latitude2 = float(args["latitude2"])
-            longitude2 = float(args["longitude2"])
-            corner1 = [longitude1, latitude1]
-            corner2 = [longitude2, latitude2]
+            latitude1 = float(args.group("latitude1"))
+            longtitude1 = float(args.group("longtitude1"))
+            latitude2 = float(args.group("latitude2"))
+            longtitude2 = float(args.group("longtitude2"))
+            corner1 = [longtitude1, latitude1]
+            corner2 = [longtitude2, latitude2]
             geoloc = {'type': 0, 'values': [corner1, corner2]}
         elif type == "circ":
-            latitude = float(args["latitude"])
-            longitude = float(args["longitude"])
-            radius = float(args["radius"])
-            center = [longitude, latitude]
+            latitude = float(args.group("latitude"))
+            longtitude = float(args.group("longtitude"))
+            radius = float(args.group("radius"))
+            center = [longtitude, latitude]
             geoloc = {'type': 1, 'values': [center, radius]}
 
         returnList = None
@@ -128,22 +128,20 @@ class CampaignService:
                 found_item = Item.search(it)
             items.append(found_item)
 
-        geoloc = ""
         if type == "rect":
-            latitude1 = float(args["latitude1"])
-            longitude1 = float(args["longitude1"])
-            latitude2 = float(args["latitude2"])
-            longitude2 = float(args["longitude2"])
-            corner1 = [longitude1, latitude1]
-            corner2 = [longitude2, latitude2]
+            latitude1 = float(args.group("latitude1"))
+            longtitude1 = float(args.group("longtitude1"))
+            latitude2 = float(args.group("latitude2"))
+            longtitude2 = float(args.group("longtitude2"))
+            corner1 = [longtitude1, latitude1]
+            corner2 = [longtitude2, latitude2]
             geoloc = {'type': 0, 'values': [corner1, corner2]}
         elif type == "circ":
-            latitude = float(args["latitude"])
-            longitude = float(args["longitude"])
-            radius = float(args["radius"])
-            center = [longitude, latitude]
+            latitude = float(args.group("latitude"))
+            longtitude = float(args.group("longtitude"))
+            radius = float(args.group("radius"))
+            center = [longtitude, latitude]
             geoloc = {'type': 1, 'values': [center, radius]}
-
 
         with campaign.mutex:
             watchid = campaign.watch(monitor.enqueue, items, geoloc, urgency)
