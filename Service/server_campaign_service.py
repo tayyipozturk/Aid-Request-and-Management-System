@@ -98,7 +98,7 @@ class CampaignService:
             geoloc = {'type': 0, 'values': [corner1, corner2]}
         elif type == "circ":
             latitude = float(args["latitude"])
-            longitude = float(args["longtitude"])
+            longitude = float(args["longitude"])
             radius = float(args["radius"])
             center = [longitude, latitude]
             geoloc = {'type': 1, 'values': [center, radius]}
@@ -133,13 +133,13 @@ class CampaignService:
             latitude1 = float(args["latitude1"])
             longitude1 = float(args["longitude1"])
             latitude2 = float(args["latitude2"])
-            longitude2 = float(args["longtitude2"])
+            longitude2 = float(args["longitude2"])
             corner1 = [longitude1, latitude1]
             corner2 = [longitude2, latitude2]
             geoloc = {'type': 0, 'values': [corner1, corner2]}
         elif type == "circ":
             latitude = float(args["latitude"])
-            longitude = float(args["longtitude"])
+            longitude = float(args["longitude"])
             radius = float(args["radius"])
             center = [longitude, latitude]
             geoloc = {'type': 1, 'values': [center, radius]}
