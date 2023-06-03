@@ -172,7 +172,7 @@ class CampaignService:
         else:
             for watch in result:
                 if watch["token"] == token:
-                    retVal.append(watch["watch_id"])
+                    retVal.append(str(watch["watch_id"]))
             if len(retVal) == 0:
                 monitor.enqueue("No watches found")
             else:
