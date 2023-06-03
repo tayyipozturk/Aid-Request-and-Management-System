@@ -44,7 +44,9 @@ class ClientThread(threading.Thread):
             try:
                 input_data = self.client_socket.recv(2048).decode()
                 data = input_data.split()
-                print(data)
+                
+                if data == []:
+                    continue
                 if data[0] == "login":
                     username = data[1]
                     password = data[2]
