@@ -177,5 +177,5 @@ class CampaignService:
                 monitor.enqueue("No watches found")
             else:
                 # return in a type of {"values": [watchid1, watchid2, ...]}
-                monitor.enqueue({"values": str(retVal)})
+                monitor.enqueue(str({"values": retVal}))
         return
