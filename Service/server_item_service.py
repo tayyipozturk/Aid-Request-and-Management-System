@@ -20,7 +20,7 @@ class ItemService:
         name = args.group("name")
         synonyms = args.group("synonyms").split(" ")
         item = Item.search(target)
-        if target is None:
+        if item is None:
             monitor.enqueue("Item does not exist")
             return
         if synonyms is None or len(synonyms) == 0:
