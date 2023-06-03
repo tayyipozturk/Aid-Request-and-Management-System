@@ -71,7 +71,10 @@ class ServerParser:
 
     @staticmethod
     def list(monitor, args):
-        result = ""
-        for i, campaign in enumerate(Campaign.collection):
-            result += f"({i},{campaign.name},{campaign.description})"
-        monitor.enqueue(f"{result}")
+        # create a json to send, eg: '{"values": ["name", "description"], ["name", "description"]}'
+        campaigns = Campaign.collection
+        monitor.enqueue('{ "values": [')
+        for campaign in campaigns:
+            monitor.enqueue('{ "name": "' + campaign.name + '", "description": "' + campaign.description + '" },')
+        monitor.enqueue(']}')
+
