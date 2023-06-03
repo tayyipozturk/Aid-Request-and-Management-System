@@ -73,5 +73,10 @@ class ServerParser:
     def list(monitor, args):
         result = ""
         for i, campaign in enumerate(Campaign.collection):
-            result += f"({i},{campaign.name},{campaign.description})"
+            if i == len(Campaign.collection) - 1:
+                result += f"[{i},{campaign.name},{campaign.description}]"
+            else:
+                result += f"[{i},{campaign.name},{campaign.description}],"
+        if result == "":
+            result += "No campaigns found"
         monitor.enqueue(f"{result}")
