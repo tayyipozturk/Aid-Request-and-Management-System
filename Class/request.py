@@ -42,10 +42,10 @@ class Request:
     def get(self):
         itemstext = ["{\"item\": "+x["item"]["data"].get()+",\"amount\": "+str(
             x["item"]["amount"])+"}" for x in self.items_dict]
-        availibilitytext = ["{\"ma_id\": "+str(x["availibility"]["ma_id"])+",\"item\": "+str(x["availibility"]["item"])+",\"amount\": "+str(x["availibility"]["amount"])+",\"supplier\": "+x["availibility"]["supplier"].username +
-                            ",\"expire\": "+str(x["availibility"]["expire"])+",\"geoloc\": "+str(x["availibility"]["geoloc"])+",\"comments\": "+x["availibility"]["comments"]+"}" for x in self.items_dict if x["availibility"] is not None]
-        onroutetext = ["{\"ma_id\": "+str(x["onroute"]["ma_id"])+",\"item\": "+str(x["onroute"]["item"])+",\"amount\": "+str(x["onroute"]["amount"])+",\"supplier\": "+x["onroute"]["supplier"].username +
-                       ",\"expire\": "+str(x["onroute"]["expire"])+",\"geoloc\": "+str(x["onroute"]["geoloc"])+",\"comments\": "+x["onroute"]["comments"]+"}" for x in self.items_dict if x["onroute"] is not None]
+        availibilitytext = ["{\"ma_id\": \""+str(x["availibility"]["ma_id"])+"\",\"item\": \""+str(x["availibility"]["item"])+"\",\"amount\": "+str(x["availibility"]["amount"])+",\"supplier\": \""+x["availibility"]["supplier"].username +
+                            "\",\"expire\": \""+str(x["availibility"]["expire"])+"\",\"geoloc\": "+str(x["availibility"]["geoloc"])+",\"comments\": \""+x["availibility"]["comments"]+"\"}" for x in self.items_dict if x["availibility"] is not None]
+        onroutetext = ["{\"ma_id\": \""+str(x["onroute"]["ma_id"])+"\",\"item\": \""+str(x["onroute"]["item"])+"\",\"amount\": "+str(x["onroute"]["amount"])+",\"supplier\": \""+x["onroute"]["supplier"].username +
+                       "\",\"expire\": \""+str(x["onroute"]["expire"])+"\",\"geoloc\": "+str(x["onroute"]["geoloc"])+",\"comments\": \""+x["onroute"]["comments"]+"\"}" for x in self.items_dict if x["onroute"] is not None]
         return '{"owner":"' + self.owner + '","items":' + str(itemstext) + ',"geoloc":' + str(self.geoloc) + ',"urgency":"' + self.urgency + '","comments":"' + self.comments + '","status":"' + self.status + '","availibility":' + str(availibilitytext) + ',"onroute":' + str(onroutetext) + '}'
 
     def update(self, owner=None, items=None, geoloc=None, urgency=None, comments=None):
@@ -135,16 +135,16 @@ class Request:
         # Delete the onroute of given itemid
         # If there is no onroute, change the status to CLOSED
         for i, item in enumerate(self.items_dict):
-            if self.items_dict[i]["onroute"]["ma_id"] == itemid:
+            if self.items_dict[i]["onroute"] is not None and self.items_dict[i]["onroute"]["ma_id"] == itemid:
                 item["item"]["amount"] -= item["onroute"]["amount"]
                 if item["item"]["amount"] == 0:
                     item["delivered"] = True
                 self.items_dict[i]["onroute"] = None
                 break
 
-        is_onroute = False
+        is_onroute = True
         for item in self.items_dict:
-            if item["onroute"] != None:
-                is_onroute = True
-        if is_onroute == False:
+            if item["delivered"] == False:
+                is_onroute = False
+        if is_onroute == True:
             self.status = 'CLOSED'
