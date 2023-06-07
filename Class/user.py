@@ -85,3 +85,12 @@ class User:
                 if user.token == token:
                     return user
         return None
+
+    @staticmethod
+    def register(username, password, name, email):
+        try:
+            User(username, email, name, password)
+            return True
+        except:
+            return False
+        

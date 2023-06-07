@@ -65,6 +65,22 @@ class ClientThread(threading.Thread):
                               "watches": [], "watch_monitor": watch_monitor}
                     userList.append(logged)
                     print(f"{username} logged in")
+                elif data[0] == "register":
+                    username = data[1]
+                    password = data[2]
+                    name = data[3]
+                    email = data[4]
+                    token = None
+                    watch_monitor = WatchMonitor(client_socket)
+                    watch_monitor.run()
+                    if len(username) > 0 and len(password) > 0:
+                        result = User.register(username, password, name, email)
+                        if result:
+                            watch_monitor.enqueue(f"Register successful")
+                        else:
+                            watch_monitor.enqueue("Register failed")
+                            continue
+                    print(f"{username} user created!")
                 else:
                     token = data[0]
                     index = self.find_user(token)
@@ -338,11 +354,12 @@ if __name__ == "__main__":
     user2 = User("ken", "ken@localhost", "Ken", "123")
     user3 = User("ros", "ros@localhost", "Ros", "123")
 
-    p = argparse.ArgumentParser()
-    p.add_argument("--port", type=int)
+    #p = argparse.ArgumentParser()
+    #p.add_argument("--port", type=int)
 
     HOST = "127.0.0.1"
-    PORT = p.parse_args().port
+    #PORT = p.parse_args().port
+    PORT = 1423
 
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
