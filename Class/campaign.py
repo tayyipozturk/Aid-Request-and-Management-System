@@ -72,7 +72,10 @@ class Campaign:
                         is_okay = False
                 if is_okay:
                     if watch["callback"] is not None:
-                        watch["callback"](f"WATCH MATCHED:\n{watch}\nTOKEN: {token}\n")
+                        #'{"owner":"' + self.owner + '","items":' + str(itemstext) + ',"geoloc":' + str(self.geoloc) + ',"urgency":"' + self.urgency + '","comments":"' + self.comments + '","status":"' + self.status + '","availibility":' + str(availibilitytext) + ',"onroute":' + str(onroutetext) + '}'
+                        watch_text = '{"token":"' + str(token) + '","request":"' + str(req_id) + '","watchcalled": true}'
+                        watch["callback"](watch_text)
+                        #watch["callback"](f"WATCH MATCHED:\n{watch}\nTOKEN: {token}\n")
 
         return req_id
 
