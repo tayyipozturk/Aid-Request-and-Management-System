@@ -88,8 +88,48 @@ class Notifications:
 
 
 async def clienthandler(websocket, path):
-    thread = ClientThread(websocket, websocket.remote_address)
-    thread.start()
+    # websocket.request_headers is a dictionary like object
+    print(websocket.request_headers.items())
+    # following parses the cookie object
+    if 'Cookie' in websocket.request_headers:
+        print(http.cookies.SimpleCookie(websocket.request_headers['Cookie']))
+
+    # get the list of ids to follow from browser
+    reqlist = await websocket.recv()
+    idlist = json.loads(reqlist)
+
+    print('connected', idlist)
+
+    Notifications().newconnection(websocket)
+    if type(idlist) != list:
+        idlist = [idlist]
+    for myid in idlist:
+        Notifications().register(websocket, myid)
+    idlist = set(idlist)
+
+    try:
+        while True:
+            data = await websocket.recv()
+            try:
+                message = json.loads(data)
+                if "command" in message and message['command'] == 'add':
+                    Notifications().register(websocket, message['id'])
+                    idlist.add(message['id'])
+                elif "command" in message and message['command'] == 'delete':
+                    Notifications().unregister(websocket, message['id'])
+                    idlist.discard(message['id'])
+                else:
+                    await Notifications().addNotification(message['id'], message)
+            except Exception as e:
+                print("invalid message. {} : exception: {}".format(data, str(e)))
+    except Exception as e:
+        print(e)
+    finally:
+        print('closing', idlist)
+        for myid in idlist:
+            Notifications().unregister(websocket, myid)
+        Notifications().closeconnection(websocket)
+        websocket.close()
 
 
 async def start_websocket_server():

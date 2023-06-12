@@ -56,7 +56,7 @@ class ClientThread(threading.Thread):
                     username = data[1]
                     password = data[2]
                     token = None
-                    watch_monitor = WatchMonitor(client_socket)
+                    watch_monitor = WatchMonitor(self.client_socket)
                     watch_monitor.run()
                     if len(username) > 0 and len(password) > 0:
                         token = User.login(username, password)
@@ -76,7 +76,7 @@ class ClientThread(threading.Thread):
                     name = data[3]
                     email = data[4]
                     token = None
-                    watch_monitor = WatchMonitor(client_socket)
+                    watch_monitor = WatchMonitor(self.client_socket)
                     watch_monitor.run()
                     if len(username) > 0 and len(password) > 0:
                         result = User.register(username, password, name, email)
