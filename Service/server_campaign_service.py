@@ -95,7 +95,7 @@ class CampaignService:
         else:
             result = ""
             for request in returnList:
-                result += str(request.get()) + "\n"
+                result += str(request.geoloc) + "\n"
             monitor.enqueue(result)
         return
 
