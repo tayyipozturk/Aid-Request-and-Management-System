@@ -89,6 +89,11 @@ class User:
     @staticmethod
     def register(username, password, name, email):
         try:
+            # chcek if user already exists
+            for user in User.collection:
+                if user.username == username or user.email == email:
+                    return False
+            # create new user
             User(username, email, name, password)
             return True
         except:
