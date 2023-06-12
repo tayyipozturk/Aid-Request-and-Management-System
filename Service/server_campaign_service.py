@@ -129,13 +129,13 @@ class CampaignService:
         with campaign.mutex:
             returnList = campaign.query(items, geoloc, urgency)
 
-        if returnList is not None:
+        if returnList is None or returnList == []:
+            monitor.enqueue("No requests found")
+        else:
             result = ""
             for request in returnList:
                 result += str(request.get()) + "\n"
             monitor.enqueue(result)
-        else:
-            monitor.enqueue("No requests found")
         return
 
     def watch(monitor, args, campaign, type):
