@@ -215,6 +215,17 @@ class ClientThread(threading.Thread):
                                 targetUser['watch_monitor'], arg, targetUser['campaign'], "circ")
                         else:
                             targetUser['watch_monitor'].enqueue("Error query")
+                    elif data[1] == "homequery":
+                        # f"{request.session.get('token')} homequery {map_loc[0]-0.025} {map_loc[1]-0.025} {map_loc[0]+0.025} {map_loc[1]+0.025}"
+                        latitude1 = data[2]
+                        longitude1 = data[3]
+                        latitude2 = data[4]
+                        longitude2 = data[5]
+
+                        arg = {'latitude1': latitude1, 'longitude1': longitude1,
+                                        'latitude2': latitude2, 'longitude2': longitude2}
+                        CampaignService.homequery(
+                            targetUser['watch_monitor'], arg, targetUser['campaign'])
                     elif data[1] == "watch":
                         # items, rectangular, (latitude, longtitude), (latitude, longtitude), urgency
                         arg = {}

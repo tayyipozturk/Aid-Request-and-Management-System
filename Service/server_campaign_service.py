@@ -77,6 +77,28 @@ class CampaignService:
             campaign.removerequest(id)
             monitor.enqueue(f"Request removed successfully: {id}")
 
+    def homequery(monitor, args, campaign):
+        latitude1 = float(args["latitude1"])
+        longitude1 = float(args["longitude1"])
+        latitude2 = float(args["latitude2"])
+        longitude2 = float(args["longitude2"])
+        corner1 = [longitude1, latitude1]
+        corner2 = [longitude2, latitude2]
+        geoloc = {'type': 0, 'values': [corner1, corner2]}
+
+        returnList = None
+        with campaign.mutex:
+            returnList = campaign.query(loc = geoloc)
+
+        if returnList is None or returnList == []: 
+            monitor.enqueue("No requests found")
+        else:
+            result = ""
+            for request in returnList:
+                result += str(request.get()) + "\n"
+            monitor.enqueue(result)
+        return
+
     def query(monitor, args, campaign, type):
         geoloc = ""
         urgency = args["urgency"]
