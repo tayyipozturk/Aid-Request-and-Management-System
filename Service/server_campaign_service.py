@@ -67,8 +67,11 @@ class CampaignService:
         username = User.find_one(token=token).username
         request = Request(username, items, geoloc, urgency, comments)
         with campaign.mutex:
-            campaign.updaterequest(req_id, request)
-            monitor.enqueue(f"Request updated successfully: {req_id}")
+            res = campaign.updaterequest(req_id, request)
+            if res:
+                monitor.enqueue(f"Request updated successfully: {req_id}")
+            else:
+                monitor.enqueue(f"Request not updated: {req_id}")
 
     def remove_request(monitor, args, campaign):
         id = args.group("id")
