@@ -17,7 +17,7 @@ class RequestService:
 
         user = User.find_one(token=token)
         items = []
-        geoloc = [longtitude, latitude]
+        geoloc = [latitude,longtitude]
 
         for it in item_list:
             item = it
