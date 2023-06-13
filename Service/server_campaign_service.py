@@ -138,7 +138,7 @@ class CampaignService:
             monitor.enqueue(result)
         return
 
-    def watch(monitor, args, campaign, type):
+    def watch(monitor, args, campaign, type, ns):
         item_list = args["items"]
         urgency = args["urgency"]
         token = args["token"]
@@ -167,7 +167,7 @@ class CampaignService:
             geoloc = {'type': 1, 'values': [center, radius]}
 
         with campaign.mutex:
-            watchid = campaign.watch(monitor.enqueue, items, geoloc, urgency, token)
+            watchid = campaign.watch(ns, items, geoloc, urgency, token)
         if watchid is None:
             monitor.enqueue("Error: Watch not added")
         else:

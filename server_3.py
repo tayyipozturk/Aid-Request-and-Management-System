@@ -14,6 +14,8 @@ from Class.watch_monitor import WatchMonitor
 import os
 import re
 
+#from tteesstt import notify_client
+from brk_ws import WebSocketThread, NotifyCentre
 
 # login username password
 # <token> new campaign_name campaign_descr
@@ -33,10 +35,11 @@ import re
 
 userList = []
 class ClientThread(threading.Thread):
-    def __init__(self, client_socket, address):
+    def __init__(self, client_socket, address, notify_centre):
         threading.Thread.__init__(self)
         self.client_socket = client_socket
         self.address = address
+        self.notify_centre = notify_centre
         print(f"New connection from {self.address}")
 
     def run(self):
@@ -245,7 +248,7 @@ class ClientThread(threading.Thread):
                             arg = {'items': items, 'latitude1': latitude1, 'longitude1': longitude1,
                                    'latitude2': latitude2, 'longitude2': longitude2, 'urgency': urgency, 'token': token}
                             watch_id = CampaignService.watch(
-                                targetUser['watch_monitor'], arg, targetUser['campaign'], "rect")
+                                targetUser['watch_monitor'], arg, targetUser['campaign'], "rect", notify_centre.newmessage)
                             targetUser['watches'].append(watch_id)
                         elif watchType == 1:
                             latitude = data[4 + int(item_count)]
@@ -255,7 +258,7 @@ class ClientThread(threading.Thread):
                             arg = {'items': items, 'latitude': latitude, 'longitude': longitude,
                                    'radius': radius, 'urgency': urgency, 'token': token}
                             watch_id = CampaignService.watch(
-                                targetUser['watch_monitor'], arg, targetUser['campaign'], "circ")
+                                targetUser['watch_monitor'], arg, targetUser['campaign'], "circ", notify_centre.newmessage)
                             targetUser['watches'].append(watch_id)
                         else:
                             targetUser['watch_monitor'].enqueue("Error watch")
@@ -377,7 +380,10 @@ if __name__ == "__main__":
     server_socket.bind((HOST, PORT))
     server_socket.listen()
     print(f"Server listening on port {PORT}...")
+    notify_centre = NotifyCentre()
+    websocket = WebSocketThread(notify_centre)
+    websocket.start()
     while True:
         client_socket, address = server_socket.accept()
-        new_thread = ClientThread(client_socket, address)
+        new_thread = ClientThread(client_socket, address, notify_centre)
         new_thread.start()
