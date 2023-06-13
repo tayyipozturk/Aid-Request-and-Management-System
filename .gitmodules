@@ -1,0 +1,3 @@
+[submodule "AidreqDjango"]
+	path = AidreqDjango
+	url = https://github.com/MBrkA/AidreqDjango
