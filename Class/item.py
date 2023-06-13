@@ -14,7 +14,7 @@ class Item:
     def get(self):
         # Return item as json
         with self.mutex:
-            return '{"name":"' + self.name + '","synonyms":' + str(self.synonyms) + '}'
+            return '{"name":"' + self.name + '","synonyms":' + str(self.synonyms).replace("\'","\"") + '}'
 
     def update(self, name=None, synonyms=None):
         # Update item with new values
