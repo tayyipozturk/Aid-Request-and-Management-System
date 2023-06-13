@@ -1,12 +1,6 @@
-# Project
+# Aid Request and Management System
 
-## Aid Request and Management System
-
-This project consists of a user class with authorization login functions.
-A campaign consists request multiple requests.
-Requesters can create requests and run queries to look for requests. They can create watchers to get notified of specific request creations.
-Requesters can request delivery of items they want if they have stock.
-Providers can inform requesters about their stock and provide items if they want to. The main frame of the application is Campaign, which processes requests and provides responses to them.
+This project is a web application that allows users to request and supply aid. It is developed using Django framework and websockets on Python.
 
 ## Students
 
@@ -16,106 +10,71 @@ Mustafa Burak Akkaya
 Muhammed Tayyip Öztürk
 2380806
 
-## Content of Files
+## Installation
 
-- `Class.user.py`: User Class File
-- `Class.item.py`: Item Class File
-- `Class.request.py`: Request Class File
-- `Class.campaign.py` Campaign Class File
-- `Enum.urgency.py`: Urgency Enum File
-- `demo.py` Command line tester
+### Requirements
 
-## How to Run
+- Python 3.10 or higher
 
-You can utilize `demo.py` to test the system's functionality. It contains a simple command line interface to test the application. You can run it by typing `python3 demo.py` in the terminal.
+### Run
 
-### Class.user.py
+Run commands below on separate terminals.
 
-This file contains the User class. It has the following attributes:
+- ```python3 server/server_3.py``` For backend and notification websocket server.
+- ```python3 django/manage.py runserver``` For Django server.
 
-- full name -> string
-- email -> string
-- username -> string
-- password -> string
-- collection -> static list of all users
+## Usage
 
-It has the following methods:
+### Register
+- User registers to the system by providing username and password.
 
-- `__init__`: Constructor
-- `get()` : Returns the user's information
-- `update(username=None, email=None, fullname=None, passwd=None)` : Updates the user's information, does not return anything
-- `delete()` : Deletes the user, does not return anything
-- `auth(plainpass)` : Checks if the plainpass is the same as the user's hashed password. Returns True if it is, False otherwise.
-- `login(username, password)`: Login function. Returns the token randomly generated for the user if the login is successful, None if already logged in.
-- `checksession(token)` : Checks if the user is logged in or not
-- `logout()`: Logout function
+### Login
+- User logs in to the system by providing username and password that is registered before.
 
-### Class.item.py
+### Campaign Operations
+#### Create
+- User can create a campaign by providing title and description by clicking `New Campaign` button.
+#### List
+- User can see all campaigns by clicking `List Campaigns` button.
+#### Open/Close
+- User can open a campaign to make miscellaneous request operations by clicking `Open Campaign` button and selecting a campaign from available campaigns' list.
+- User can close the current campaign if applicable, by clicking `Close Campaign` button.
 
-This file contains the Item class. It has the following attributes:
+### Item Operations
+#### Search (Adds if not found)
+- User can search an item by providing either item name or synonym. If the search is successful, user can see the item's name and synonyms and, item is automatically added to the campaign otherwise.
+#### Update
+- User can update an item by entering the target item name and providing item name and new synonyms.
+#### Delete
+- User can delete an item by entering the target item name.
 
-- name -> string
-- synonyms -> list of strings
-- collection -> static list of all items
+### Request Operations
+#### Add
+- User can add a request by providing item(s) and quantity(ies) by clicking `Add Request` button with the request location selected on the map, urgency of the request and the description.
+#### List
+- User can see all requests by clicking `List Requests` button. Moreover, request info can be accessed via view button for each request in the list.
+#### Update
+- User can update a request by clicking `Update Request` button and selecting a request from the list. Then, user can update the request by providing new item(s) and quantity(ies), request location, urgency of the request and the description.
+#### Delete
+- User can delete a request by clicking `Remove Request` button and selecting a request from the list.
 
-It has the following methods:
-
-- `__init__`: Constructor
-- `get()` : Returns the item's information as dictionary. -> `{'name': <itemname>, 'synonyms': ['<synonym1>', '<synonym2>', ...].join(",")}`
-- `update(name=None, synonyms=None)` : Updates the item's information, does not return anything
-- `delete()` : Deletes the item, does not return anything
-- `search(name)` : Static method. Searches for an item with the given name. Returns the item if found, None otherwise and instantiates the item.
-
-### Class.request.py
-
-This file contains the Request class. It has the following attributes:
-
-- owner -> string
-- items_dict -> dictionary of items and their quantities -> `{'item': <itemname>, 'availibility': <availibility>, 'onroute': <onroute>}`
-- geoloc -> in the form of rectangular region `` 'type': 0, 'values`: [[long, latitude],[long, latitude]] `` or circular region `'type': 1, 'values': [[long, latitude], radius]`
-- urgency -> integer from 1 to 5
-- comment -> string
-- status -> string `open` or `closed`
-- collection -> static list of all requests
-
-It has the following methods:
-
-- `__init__`: Constructor
-- `get()` : Returns the request's information as dictionary. -> `{'owner': <username>, 'items': [{'item': <itemname>, 'availibility': <availibility>, 'onroute': <onroute>}, ...], 'geoloc': {'type': <type>, 'values': [<value1>, <value2>, ...]}, 'urgency': <urgency>, 'comment': <comment>>}`
-- `update(owner=None, items_dict=None, geoloc=None, urgency=None, comment=None)` : Updates the request's information, returns True if successful, False otherwise
-- `delete()` : Deletes the request, return True if successful, False otherwise
-- `markavailable(user, items, expire, geoloc, comments)` : Marks the request as available. Returns unique ma_id if successful
-- `pick(itemid, items)` : Picks the item that is available, marks it as onroute. Does not return anything
-- `arrived(itemid)` : Marks the item's status as closed. Does not return anything
-
-### Class.campaign.py
-
-This file contains the Campaign class. It has the following attributes:
-
-- name -> string
-- requests -> list of requests
-- description -> string
-- requests -> dictionary of requests -> `{'req_id': <requestid>, 'data': <request>}`
-- watches -> dictionary of watches -> `{'watch_id': <watchid>, 'callback': <callback_function>, 'item': <item>, 'loc':<location>, 'urgency': <urgency>}`
-- collection -> static list of all campaigns
-
-It has the following methods:
-
-- `__init__`: Constructor
-- `addrequest(request)` : Adds a request to the campaign. Returns request id if successful, None otherwise
-- `remove(requestid)` : Removes a request from the campaign. Returns True if successful, False otherwise
-- `update(requestid, owner=None, items_dict=None, geoloc=None, urgency=None, comment=None)` : Updates the request's information, returns True if successful, False otherwise
-- `getrequest(requestid)` : Returns the request `(request_dict['data'].get())` with the given id if found, None otherwise
-- `query(item=None, loc=None, urgency=None)` : Returns a list of requests that match the given parameters. Item parameter is an array of Items.
-- `watch(callback, item, loc, urgency)` : Adds a watch to the campaign for the items in the item array. Returns watch id if successful, None otherwise
-- `unwatch(watchid)` : Removes a watch from the campaign. Returns True if successful, False otherwise
-
-### Enum.urgency.py
-
-This file contains the Urgency enum. It has the following attributes:
-
-- `URGENT` -> 1
-- `SOON` -> 2
-- `DAYS` -> 3
-- `WEEKS` -> 4
-- `OPTIONAL` -> 5
+### Request Operations for Aid Suppliers
+#### Search
+- User can search an area for requests by clicking either Rectangular or Circular button under the `Search` tab.
+- If Rectangular is selected, user can enter two points' latitude and longitude values to create a rectangular area. By entering the item name and the urgency of the request, user can see all requests in the area.
+- If Circular is selected, user can enter a point's latitude and longitude values and a radius value to create a circular area. By entering the item name and the urgency of the request, user can see all requests in the area.
+#### Watch
+- User can watch future requests for an item by clicking either Rectangular or Circular button under the `Watch` tab.
+- If Rectangular is selected, user can enter two points' latitude and longitude values to create a rectangular area. By entering the item name and the urgency of the request, user can see all requests in the area with the urgency more severe than or equal to the entered urgency.
+- If Circular is selected, user can enter a point's latitude and longitude values and a radius value to create a circular area. By entering the item name and the urgency of the request, user can see all requests in the area with the urgency more severe than or equal to the entered urgency.
+- After a request matching the criteria is added to the system, user is notified by a notification message.
+#### Unwatch
+- Unwatching a request is also possible by clicking `Unwatch` button under the `Watch` tab and selecting a request already watched by the user from the list.
+#### Mark Available
+- User can mark an item as available by clicking `Mark Available` button in the `Request Info` page via listing requests. Then, user can enter the item and quantity to mark as available. Availability time and location with the comments are also required.
+- If a request is available, supplier location can also be seen on the map with the request location.
+### Request Operations for Aid Requesters
+#### Pick
+- If an item is marked as available, it can be seen under the `Available Supplies` tab in the request info page. By clicking on the select button, requester can pick the supply by entering the quantity of the item. If pick quantity is more than available items, number of available items are picked.
+#### Arrive
+- If an item is picked, requester can click `Arrive` button in the request info page to complete the process. If all items in the request are picked and arrived, the request status is changed to `CLOSED`.
