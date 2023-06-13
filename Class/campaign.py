@@ -172,7 +172,7 @@ class Campaign:
                     if Urgency[request["data"].urgency].value > Urgency[urgency].value:
                         is_okay = False
                 if is_okay:
-                    returnList.append(request["data"])
+                    returnList.append(request)
         return returnList
 
     def watch(self, callback=None, item=None, loc=None, urgency=None, token=None):

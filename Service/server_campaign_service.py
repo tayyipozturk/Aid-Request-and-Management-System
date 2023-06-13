@@ -15,7 +15,7 @@ class CampaignService:
         urgency = args.group("urgency")
         comments = args.group("descr")
         items = []
-        geoloc = [longtitude, latitude]
+        geoloc = [latitude, longtitude]
 
         for it in item_list:
             item = it
@@ -98,7 +98,7 @@ class CampaignService:
         else:
             result = ""
             for request in returnList:
-                result += str(request.geoloc) + "\n"
+                result += str(request["data"].geoloc) + "\n"
             monitor.enqueue(result)
         return
 
@@ -137,7 +137,7 @@ class CampaignService:
         else:
             result = ""
             for request in returnList:
-                result += str(request.get()) + "\n"
+                result += str(request["req_id"]) + "\n"
             monitor.enqueue(result)
         return
 

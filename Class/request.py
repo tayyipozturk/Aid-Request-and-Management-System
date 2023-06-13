@@ -49,6 +49,9 @@ class Request:
         return '{"owner":"' + self.owner + '","items":' + str(itemstext) + ',"geoloc":' + str(self.geoloc) + ',"urgency":"' + self.urgency + '","comments":"' + self.comments + '","status":"' + self.status + '","availibility":' + str(availibilitytext) + ',"onroute":' + str(onroutetext) + '}'
 
     def update(self, owner=None, items=None, geoloc=None, urgency=None, comments=None):
+        # Check if request is open
+        if self.status != 'OPEN':
+            return False
         # Check if the new items are compatible with onroute
         if items is not None:
             for item in self.items_dict:
