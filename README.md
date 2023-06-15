@@ -7,7 +7,7 @@ This project is a web application that allows users to request and supply aid. I
 Mustafa Burak Akkaya
 2396968
 
-Muhammed Tayyip Öztürk
+Tayyip Öztürk
 2380806
 
 ## Installation
